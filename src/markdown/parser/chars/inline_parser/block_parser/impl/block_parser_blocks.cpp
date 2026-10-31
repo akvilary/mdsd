@@ -1,4 +1,4 @@
-// Блочный парсер: комментарий, fence, ATX-заголовок, hr, код с отступом.
+// Block parser: comment, fence, ATX header, hr, indented code.
 
 #include "markdown/parser/chars/inline_parser/block_parser/block_parser.hpp"
 
@@ -25,7 +25,7 @@ BlockPtr BlockParser::tryComment() {
     return nullptr;
 }
 
-// Остаток строки после "-->" — контент; вставляем его отдельной строкой
+// The rest of the line after "-->" is content; insert it as a separate line
 BlockPtr BlockParser::skipRestOfComment(size_t after) {
     const std::string rest(trim(mLines[mCursor].substr(after)));
     ++mCursor;
@@ -46,7 +46,7 @@ BlockPtr BlockParser::tryFence() {
     ++mCursor;
     std::vector<std::string> body = collectFenceBody(fc, fl);
     if (mCursor < mLines.size()) {
-        ++mCursor; // закрывающий fence
+        ++mCursor; // closing fence
     }
     auto b = std::make_unique<Block>();
     b->type = Block::Type::Code;

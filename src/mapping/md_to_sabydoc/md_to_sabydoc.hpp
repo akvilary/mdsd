@@ -14,7 +14,7 @@ namespace mapping {
 /// \brief Mapping options supplied by the caller.
 struct Options {
     std::string title;
-    std::string pageName = "Базовый";
+    std::string pageName = "Basic";
 };
 
 /// \brief Maps a markdown document to the SabyDoc model.

@@ -1,4 +1,4 @@
-// Блочный парсер: цитаты и списки (включая гвард ленивого продолжения).
+// Block parser: quotes and lists (including the lazy-continuation guard).
 
 #include "markdown/parser/chars/inline_parser/block_parser/block_parser.hpp"
 
@@ -40,7 +40,7 @@ std::vector<std::string> BlockParser::collectQuoteBody() {
             ++mCursor;
             continue;
         }
-        if (lastWasText && !isBlockStarter(line)) { // ленивое продолжение — только после текста
+        if (lastWasText && !isBlockStarter(line)) { // lazy continuation — only after text
             qt.push_back(rtrimCopy(line));
             ++mCursor;
             continue;
@@ -91,7 +91,7 @@ BlockPtr BlockParser::tryList(int depth) {
     return b;
 }
 
-// Пункт текущего типа в позиции mCursor (пустые строки пропускаются); двигает mCursor на маркер.
+// An item of the current kind at mCursor (blank lines skipped); advances mCursor onto the marker.
 std::optional<Marker> BlockParser::peekListItem(bool ordered) {
     while (mCursor < mLines.size() && isBlank(mLines[mCursor])) {
         ++mCursor;
@@ -125,7 +125,7 @@ std::vector<std::string> BlockParser::gatherItem(const Marker& m) {
         if (isBlockStarter(ln)) {
             break;
         }
-        if (lastWasText) { // гвард ленивого продолжения
+        if (lastWasText) { // lazy-continuation guard
             item.push_back(rtrimCopy(ln));
             ++mCursor;
             continue;

@@ -75,7 +75,7 @@ ResourceCollector::ResourceCollector(std::filesystem::path baseDir,
 std::string ResourceCollector::addImage(const std::string& url, unsigned& width, unsigned& height) {
     width = height = 0;
     if (isRemote(url)) {
-        mDiagnostics.push_back("удалённая картинка не загружается (нет сетевых зависимостей): " +
+        mDiagnostics.push_back("remote image not fetched (no network dependencies): " +
                                url);
         return "";
     }
@@ -100,13 +100,13 @@ std::string ResourceCollector::addImage(const std::string& url, unsigned& width,
     bool ok = false;
     const std::string bytes = readFileBytes(p, ok);
     if (!ok) {
-        mDiagnostics.push_back("файл картинки не найден: " + url);
+        mDiagnostics.push_back("image file not found: " + url);
         return "";
     }
     ImageSize size = probeImageSize(bytes);
     if (!size.ok) {
-        mDiagnostics.push_back("не удалось определить размеры картинки (формат не распознан), "
-                               "использованы значения по умолчанию: " +
+        mDiagnostics.push_back("cannot determine image dimensions (format not recognized), "
+                               "using default values: " +
                                url);
         size.width = 600;
         size.height = 400;

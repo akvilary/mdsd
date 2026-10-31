@@ -1,4 +1,4 @@
-// Блочный парсер: GFM-таблицы (шапка + разделитель + тело).
+// Block parser: GFM tables (header + delimiter + body).
 
 #include "markdown/parser/chars/inline_parser/block_parser/block_parser.hpp"
 

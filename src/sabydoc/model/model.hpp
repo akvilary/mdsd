@@ -101,7 +101,7 @@ struct Resource {
 /// \brief The whole SabyDoc document: title, blocks, and resources.
 struct Document {
     std::string title; // documentHeader
-    std::string pageName = "Базовый";
+    std::string pageName = "Basic";
     std::vector<BlockPtr> blocks;    // children of the root textLayout
     std::vector<Resource> resources; // in order of appearance
     std::string pageId, layoutId, rootTextLayoutId, headerId;

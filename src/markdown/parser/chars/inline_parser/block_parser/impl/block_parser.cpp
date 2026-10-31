@@ -1,5 +1,5 @@
-// Блочный парсер: каркас обхода — инлайн-мост, цикл блоков, диспетчер parseOne,
-// рекурсивный разбор подмножества строк.
+// Block parser: traversal skeleton — inline bridge, block loop, parseOne dispatcher,
+// recursive parsing of a line subset.
 
 #include "markdown/parser/chars/inline_parser/block_parser/block_parser.hpp"
 
@@ -17,7 +17,7 @@ std::vector<InlineElement> BlockParser::parseInline(const std::string& s) {
 std::vector<BlockPtr> BlockParser::parseBlocks(int depth) {
     std::vector<BlockPtr> out;
     if (depth > kMaxNestingDepth) {
-        mWarnings.push_back("слишком глубокая вложенность блоков — часть содержимого пропущена");
+        mWarnings.push_back("nesting too deep — some content skipped");
         return out;
     }
     while (mCursor < mLines.size()) {

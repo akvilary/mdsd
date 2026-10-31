@@ -19,22 +19,22 @@ constexpr const char* kVersion = "1.0.0";
 
 void printUsage() {
     std::printf(
-        "mdsd %s — конвертер Markdown <-> SabyDoc\n"
+        "mdsd %s — Markdown <-> SabyDoc converter\n"
         "\n"
-        "Использование:\n"
-        "  mdsd convert ВХОД.md [-o ВЫХОД.sabydoc] [опции]\n"
+        "Usage:\n"
+        "  mdsd convert INPUT.md [-o OUTPUT.sabydoc] [options]\n"
         "\n"
-        "Опции:\n"
-        "  -o, --output ФАЙЛ   итоговый .sabydoc (по умолчанию: как ВХОД, с расширением .sabydoc)\n"
-        "      --title ТЕКСТ   заголовок документа (documentHeader); по умолчанию: title из\n"
-        "                      front matter, иначе --title, иначе имя файла без расширения\n"
-        "      --page-name ИМЯ имя страницы (по умолчанию \"Базовый\")\n"
-        "      --strict        предупреждения считаются ошибкой (код возврата 3)\n"
-        "  -h, --help          эта справка\n"
-        "      --version       версия\n"
+        "Options:\n"
+        "  -o, --output FILE   output .sabydoc (default: same as INPUT, with .sabydoc extension)\n"
+        "      --title TEXT    document title (documentHeader); default: title from\n"
+        "                      front matter, then --title, then filename stem\n"
+        "      --page-name NAME page name (default \"Basic\")\n"
+        "      --strict        treat warnings as errors (exit code 3)\n"
+        "  -h, --help          this help\n"
+        "      --version       version\n"
         "\n"
-        "Коды возврата: 0 — успех, 1 — ошибка ввода-вывода, 2 — неверные аргументы, 3 — "
-        "предупреждения при --strict\n",
+        "Exit codes: 0 — success, 1 — I/O error, 2 — invalid arguments, 3 — "
+        "warnings with --strict\n",
         kVersion);
 }
 
@@ -43,7 +43,7 @@ struct Args {
     std::string output;
     std::string title;
     bool hasTitle = false;
-    std::string pageName = "Базовый";
+    std::string pageName = "Basic";
     bool strict = false;
 };
 
@@ -75,7 +75,7 @@ ArgsResult parseArgs(std::span<char* const> args, Args& out) {
         const std::string a = args[i];
         auto needValue = [&](const char* name) -> const char* {
             if (i + 1 >= args.size()) {
-                std::fprintf(stderr, "Ошибка: у %s не хватает значения\n", name);
+                std::fprintf(stderr, "Error: %s requires a value\n", name);
                 std::exit(2);
             }
             ++i;
@@ -94,18 +94,18 @@ ArgsResult parseArgs(std::span<char* const> args, Args& out) {
             printUsage();
             return ArgsResult::HelpShown;
         } else if (!a.empty() && a[0] == '-') {
-            std::fprintf(stderr, "Ошибка: неизвестная опция %s\n", a.c_str());
+            std::fprintf(stderr, "Error: unknown option %s\n", a.c_str());
             return ArgsResult::UsageError;
         } else if (!haveInput) {
             out.input = a;
             haveInput = true;
         } else {
-            std::fprintf(stderr, "Ошибка: лишний позиционный аргумент %s\n", a.c_str());
+            std::fprintf(stderr, "Error: extra positional argument %s\n", a.c_str());
             return ArgsResult::UsageError;
         }
     }
     if (!haveInput) {
-        std::fprintf(stderr, "Ошибка: не указан входной файл\n");
+        std::fprintf(stderr, "Error: input file not specified\n");
         return ArgsResult::UsageError;
     }
     return ArgsResult::Ok;
@@ -148,7 +148,7 @@ int main(int argc, char** argv) {
     const fs::path input(args.input);
     std::error_code ec;
     if (!fs::exists(input, ec) || fs::is_directory(input, ec)) {
-        std::fprintf(stderr, "Ошибка: входной файл не найден: %s\n", args.input.c_str());
+        std::fprintf(stderr, "Error: input file not found: %s\n", args.input.c_str());
         return 1;
     }
     fs::path output(args.output);
@@ -156,14 +156,14 @@ int main(int argc, char** argv) {
         output = input.parent_path() / (input.stem().string() + ".sabydoc");
     }
     if (fs::weakly_canonical(input, ec) == fs::weakly_canonical(output, ec)) {
-        std::fprintf(stderr, "Ошибка: выходной файл совпадает со входным\n");
+        std::fprintf(stderr, "Error: output file is the same as input\n");
         return 1;
     }
 
     bool ok = false;
     const std::string text = readFile(input, ok);
     if (!ok) {
-        std::fprintf(stderr, "Ошибка: не удалось прочитать %s\n", args.input.c_str());
+        std::fprintf(stderr, "Error: cannot read %s\n", args.input.c_str());
         return 1;
     }
 
@@ -190,12 +190,12 @@ int main(int argc, char** argv) {
     try {
         bytes = sd::buildSabydocArchive(sdoc);
     } catch (const std::exception& e) {
-        std::fprintf(stderr, "Ошибка сборки архива: %s\n", e.what());
+        std::fprintf(stderr, "Error building archive: %s\n", e.what());
         return 1;
     }
 
     if (!writeFile(output, bytes)) {
-        std::fprintf(stderr, "Ошибка: не удалось записать %s\n", output.string().c_str());
+        std::fprintf(stderr, "Error: cannot write %s\n", output.string().c_str());
         return 1;
     }
 
@@ -206,15 +206,15 @@ int main(int argc, char** argv) {
         }
     }
 
-    std::printf("Готово: %s (%zu байт)\n", output.string().c_str(), bytes.size());
-    std::printf("  блоков: %zu, заголовков: %zu, картинок: %zu\n", sdoc.blocks.size(), headers,
+    std::printf("Done: %s (%zu bytes)\n", output.string().c_str(), bytes.size());
+    std::printf("  blocks: %zu, headers: %zu, images: %zu\n", sdoc.blocks.size(), headers,
                 imageCount);
     for (const std::string& w : diagnostics) {
-        std::printf("  [предупреждение] %s\n", w.c_str());
+        std::printf("  [warning] %s\n", w.c_str());
     }
 
     if (args.strict && !diagnostics.empty()) {
-        std::fprintf(stderr, "--strict: есть предупреждения (%zu)\n", diagnostics.size());
+        std::fprintf(stderr, "--strict: %zu warnings\n", diagnostics.size());
         return 3;
     }
     return 0;

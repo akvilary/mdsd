@@ -1,4 +1,4 @@
-// Инлайновый парсер: каркас обхода, экранирование, код-спаны, сущности.
+// Inline parser: traversal skeleton, escapes, code spans, entities.
 
 #include "markdown/parser/chars/inline_parser/inline_parser.hpp"
 
@@ -24,7 +24,7 @@ std::vector<InlineElement> InlineParser::parse(const std::string& s) {
 size_t InlineParser::tryEscape(const Ctx& c, size_t i, std::string& buf) {
     if (i + 1 < c.s.size() && isPunct(c.s[i + 1])) {
         buf += c.s[i + 1];
-        return 2; // обратный слэш + экранированный символ
+        return 2; // backslash + escaped character
     }
     return 0;
 }
@@ -33,12 +33,12 @@ size_t InlineParser::tryCodeSpan(const Ctx& c, size_t i, std::vector<InlineEleme
                                  std::string& buf) const {
     const size_t n = countRun(c.s, i, [](char ch) { return ch == '`'; }) - i;
     const size_t close = findCodeSpanClose(c.s, i + n, n);
-    if (close == std::string::npos) { // нет парного забора той же длины — литерал
+    if (close == std::string::npos) { // no matching fence of the same length — literal
         buf.append(n, '`');
         return n;
     }
     std::string content = c.s.substr(i + n, close - (i + n));
-    if (needsSpaceTrim(content)) { // обрезка одного пробела по краям (CommonMark)
+    if (needsSpaceTrim(content)) { // trim one space at both edges (CommonMark)
         content = content.substr(1, content.size() - 2);
     }
     emitRun(c, out, buf);
@@ -57,7 +57,7 @@ size_t InlineParser::findCodeSpanClose(const std::string& s, size_t from, size_t
             if (m == n) {
                 return j;
             }
-            j += m; // забор другой длины не закрывает спан
+            j += m; // a fence of a different length does not close the span
         } else {
             ++j;
         }
@@ -80,12 +80,12 @@ size_t InlineParser::tryEntity(const Ctx& c, size_t i, std::string& buf) const {
     return 0;
 }
 
-// Главный обход: диспетчеризация по текущему символу; try*-обработчик возвращает
-// сколько символов потреблено (0 = не его конструкция, символ уходит в буфер).
+// Main traversal: dispatch on the current character; a try* handler returns how
+// many characters it consumed (0 = not its construct, the character goes to the buffer).
 std::vector<InlineElement> InlineParser::parseRec(const Ctx& c) const {
     std::vector<InlineElement> out;
     if (c.depth > kMaxNestingDepth) {
-        warn("слишком глубокая вложенность инлайн-конструкций — текст оставлен как есть");
+        warn("inline nesting too deep — text left as-is");
         if (!c.s.empty()) {
             out.push_back(InlineElement{InlineElement::Kind::Run, InlineRun{c.s, c.st, c.link},
                                         InlineImage{}});

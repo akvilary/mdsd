@@ -61,13 +61,13 @@ ZipWriter::ZipWriter() = default;
 
 void ZipWriter::addFile(const std::string& name, const std::string& data) {
     if (mFinished) {
-        throw std::runtime_error("ZipWriter: addFile после finish()");
+        throw std::runtime_error("ZipWriter: addFile after finish()");
     }
     if (mEntries.size() >= 0xFFFF) {
-        throw std::runtime_error("ZipWriter: слишком много записей (лимит ZIP32: 65535)");
+        throw std::runtime_error("ZipWriter: too many entries (ZIP32 limit: 65535)");
     }
     if (data.size() > kMaxZip32Size || name.size() > 0xFFFF) {
-        throw std::runtime_error("ZipWriter: превышен лимит ZIP32");
+        throw std::runtime_error("ZipWriter: ZIP32 limit exceeded");
     }
 
     Entry e;
@@ -82,7 +82,7 @@ void ZipWriter::addFile(const std::string& name, const std::string& data) {
 
 std::string ZipWriter::finish() {
     if (mFinished) {
-        throw std::runtime_error("ZipWriter: finish() вызван повторно");
+        throw std::runtime_error("ZipWriter: finish() called twice");
     }
     mFinished = true;
 
@@ -91,7 +91,7 @@ std::string ZipWriter::finish() {
 
     for (Entry& e : mEntries) {
         if (out.size() > kMaxZip32Size - e.data.size() - e.name.size() - 64) {
-            throw std::runtime_error("ZipWriter: архив превышает 4 ГБ (лимит ZIP32)");
+            throw std::runtime_error("ZipWriter: archive exceeds 4 GB (ZIP32 limit)");
         }
         e.offset = static_cast<uint32_t>(out.size());
 

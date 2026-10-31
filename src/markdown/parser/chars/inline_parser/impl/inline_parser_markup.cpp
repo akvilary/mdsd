@@ -1,4 +1,4 @@
-// Инлайновый парсер: акцент, '<' (комментарии/автоссылки/HTML-теги).
+// Inline parser: emphasis, '<' (comments/autolinks/HTML tags).
 
 #include "markdown/parser/chars/inline_parser/inline_parser.hpp"
 
@@ -56,7 +56,7 @@ size_t InlineParser::tryEmphasis(const Ctx& c, size_t i, std::vector<InlineEleme
     return 0;
 }
 
-// Опенер: за токеном не конец/не пробел; для _ и __ перед — не буква
+// Opener: after the token there is no end/space; for _ and __ the char before is not a letter
 bool InlineParser::canOpenEmphasis(const std::string& s, size_t i, size_t tokLen, bool wordRule) {
     if (i + tokLen >= s.size()) {
         return false;
@@ -73,12 +73,12 @@ bool InlineParser::canOpenEmphasis(const std::string& s, size_t i, size_t tokLen
     return true;
 }
 
-// Клозер: перед — не пробел; для _ и __ после — не буква
+// Closer: the char before is not a space; for _ and __ the char after is not a letter
 size_t InlineParser::findEmphasisClose(const std::string& s, size_t from, std::string_view tok,
                                        bool wordRule) {
     size_t i = from;
     while (i < s.size()) {
-        if (s[i] == '\\') { // экранированный разделитель не считается
+        if (s[i] == '\\') { // an escaped delimiter does not count
             i += 2;
             continue;
         }
@@ -142,7 +142,7 @@ std::string InlineParser::autolinkUrl(const std::string& inner) {
     if (inner.starts_with("mailto:")) {
         return inner;
     }
-    if (inner.find(':') == std::string::npos) { // похоже на почту
+    if (inner.find(':') == std::string::npos) { // looks like an e-mail
         const size_t at = inner.find('@');
         const size_t dot = (at == std::string::npos) ? std::string::npos : inner.find('.', at);
         if (at > 0 && at != std::string::npos && dot != std::string::npos && dot > at + 1) {
@@ -159,14 +159,14 @@ size_t InlineParser::tryHtmlTag(const Ctx& c, size_t i, std::vector<InlineElemen
         return 0;
     }
     if (tag.name == "br") {
-        buf += '\n'; // жёсткий перенос
+        buf += '\n'; // hard line break
         return tag.end - i;
     }
     if (tag.name == "img") {
         return tryImgTag(c, i, tag, out, buf);
     }
     if (tag.closing) {
-        return tag.end - i; // одиночный закрывающий — пропускаем
+        return tag.end - i; // a lone closing tag — skip it
     }
     const int kind = styleTagKind(tag.name);
     if (kind != 0) {
@@ -174,7 +174,7 @@ size_t InlineParser::tryHtmlTag(const Ctx& c, size_t i, std::vector<InlineElemen
             return u;
         }
     }
-    // незакрытые парные / прозрачные / неизвестные теги: выкидываем сам тег
+    // unclosed paired / transparent / unknown tags: drop the tag itself
     return tag.end - i;
 }
 
@@ -196,7 +196,7 @@ size_t InlineParser::tryStyledTag(const Ctx& c, size_t i, const HtmlTag& tag, in
                                   std::vector<InlineElement>& out, std::string& buf) const {
     const size_t close = findClosingTag(c.s, tag.end, tag.name);
     if (close == std::string::npos) {
-        return 0; // незакрытый парный тег — пропустит вызывающий (сам тег)
+        return 0; // unclosed paired tag — the caller will skip (the tag itself)
     }
     const std::string inner = c.s.substr(tag.end, close - tag.end);
     emitRun(c, out, buf);

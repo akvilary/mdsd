@@ -1,4 +1,4 @@
-// Блочный парсер: абзацы, setext, GFM-таблица поверх абзаца, жёсткие переносы.
+// Block parser: paragraphs, setext, GFM table over a paragraph, hard line breaks.
 
 #include "markdown/parser/chars/inline_parser/block_parser/block_parser.hpp"
 
@@ -55,7 +55,7 @@ BlockPtr BlockParser::parseParagraph() {
     return b;
 }
 
-// setext-подчёркивание и GFM-таблица «поверх» последней строки абзаца
+// A setext underline and a GFM table "over" the last paragraph line
 BlockPtr BlockParser::tryParagraphSpecial(std::vector<std::pair<std::string, bool>>& collected,
                                           const std::string& line) {
     if (int level = 0; !collected.empty() && isSetextUnderline(line, level)) {
@@ -74,7 +74,7 @@ BlockPtr BlockParser::tryParagraphSpecial(std::vector<std::pair<std::string, boo
     return nullptr;
 }
 
-// Строка-разделитель превращает предыдущую строку абзаца в шапку таблицы
+// A delimiter line turns the previous paragraph line into a table header
 BlockPtr BlockParser::tableFromDelimiter(const std::string& headerLine,
                                          const std::string& delimLine) {
     if (headerLine.find('|') == std::string::npos) {
@@ -92,8 +92,8 @@ BlockPtr BlockParser::tableFromDelimiter(const std::string& headerLine,
     return buildTable(header, *aligns);
 }
 
-// Строка абзаца: (текст, жёсткий-перенос-после). Два+ пробела в конце — жёсткий
-// перенос; нечётное число обратных слэшей в конце — тоже (чётное — экранированные пары).
+// A paragraph line: (text, hard-break-after). Two or more trailing spaces mean a
+// hard break, and so does an odd number of trailing backslashes (even = escaped pairs).
 void BlockParser::addParagraphLine(std::vector<std::pair<std::string, bool>>& collected,
                                    std::string l) {
     bool hard = false;

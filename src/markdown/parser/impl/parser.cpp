@@ -10,7 +10,7 @@ Document parseMarkdown(const std::string& text) {
     std::string sanitized = text;
     const size_t replaced = utf8::sanitize(sanitized);
     if (replaced) {
-        warnings.push_back("заменено некорректных UTF-8 последовательностей: " +
+        warnings.push_back("invalid UTF-8 sequences replaced: " +
                            std::to_string(replaced));
     }
     detail::BlockParser parser(warnings);

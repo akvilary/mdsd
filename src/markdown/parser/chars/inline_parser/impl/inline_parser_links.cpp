@@ -1,4 +1,4 @@
-// Инлайновый парсер: ссылки, картинки по ссылкам, голые URL.
+// Inline parser: links, link images, bare URLs.
 
 #include "markdown/parser/chars/inline_parser/inline_parser.hpp"
 
@@ -15,7 +15,7 @@ bool InlineParser::lookupDef(const std::string& rawLabel, LinkDef& out) const {
     return true;
 }
 
-// Цель ссылки: (адрес) / [ref] / [ref][] / collapsed [ref]. false — не ссылка.
+// Link target: (destination) / [ref] / [ref][] / collapsed [ref]. false — not a link.
 bool InlineParser::resolveTarget(const std::string& s, size_t close, const std::string& inner,
                                  std::string& url, std::string& title, size_t& after) const {
     if (close + 1 < s.size() && s[close + 1] == '(' &&
@@ -90,7 +90,7 @@ size_t InlineParser::tryBareUrl(const Ctx& c, size_t i, std::vector<InlineElemen
         return 0;
     }
     const char prev = (i > 0) ? c.s[i - 1] : '\0';
-    if (prev != '\0' && isWordByte(static_cast<unsigned char>(prev))) { // не в середине слова
+    if (prev != '\0' && isWordByte(static_cast<unsigned char>(prev))) { // not in the middle of a word
         return 0;
     }
     size_t end = i;
@@ -107,7 +107,7 @@ size_t InlineParser::tryBareUrl(const Ctx& c, size_t i, std::vector<InlineElemen
     return consumedTo - i;
 }
 
-// Убираем хвостовую пунктуацию и лишние непарные ')'
+// Strip trailing punctuation and extra unbalanced ')'
 std::pair<std::string, size_t> InlineParser::trimUrlPunctuation(const std::string& s, size_t from,
                                                                 size_t to) {
     size_t t = to;

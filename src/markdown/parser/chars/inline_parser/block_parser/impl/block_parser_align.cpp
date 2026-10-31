@@ -1,4 +1,4 @@
-// Блочный парсер: html-обёртки выравнивания <div/p/center align=...>.
+// Block parser: alignment HTML wrappers <div/p/center align=...>.
 
 #include "markdown/parser/chars/inline_parser/block_parser/block_parser.hpp"
 
@@ -19,7 +19,7 @@ BlockPtr BlockParser::tryAlignWrapper(int depth) {
     return tryBlockAlign(*wrap, depth);
 }
 
-// Однострочный вариант: <div align=...>текст</div>
+// Single-line variant: <div align=...>text</div>
 BlockPtr BlockParser::trySingleLineAlign(const std::string& tag, Align align) {
     const std::string& line = mLines[mCursor];
     const size_t openEnd = line.find('>', indentOf(line));
@@ -53,7 +53,7 @@ BlockPtr BlockParser::tryBlockAlign(const AlignWrap& wrap, int depth) {
             break;
         }
         if (isBlank(mLines[mCursor])) {
-            break; // CommonMark: html-блок кончается пустой строкей
+            break; // CommonMark: an HTML block ends at a blank line
         }
         inner.push_back(mLines[mCursor]);
         ++mCursor;
@@ -104,7 +104,7 @@ std::optional<BlockParser::AlignWrap> BlockParser::tryAlignTag(const std::string
     return AlignWrap{tag, align};
 }
 
-// Значение align=; сканер атрибутов общий (html_tag::attrValue, защита от "data-align").
+// The align= value; the attribute scanner is shared (html_tag::attrValue, guards against "data-align").
 Align BlockParser::alignFromAttrs(const std::string& attrs, bool centerTag) {
     const std::string v = attrValue(attrs, "align");
     if (v.empty() && centerTag) {

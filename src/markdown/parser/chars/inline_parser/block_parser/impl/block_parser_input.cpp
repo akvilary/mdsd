@@ -1,5 +1,5 @@
-// Блочный парсер: подготовка входа — нормализация, front matter, разбиение на строки,
-// предскан определений ссылок.
+// Block parser: input preparation — normalization, front matter, line splitting,
+// link-definition prescan.
 
 #include "markdown/parser/chars/inline_parser/block_parser/block_parser.hpp"
 
@@ -39,7 +39,7 @@ std::string BlockParser::normalize(std::string s) {
     return expandLeadingTabs(noCr);
 }
 
-// Ведущие табы -> пробелы до стопа 4; внутренние табы не трогаем (код!)
+// Leading tabs -> spaces up to the next stop of 4; inner tabs are left untouched (code!)
 std::string BlockParser::expandLeadingTabs(const std::string& s) {
     std::string out;
     out.reserve(s.size());

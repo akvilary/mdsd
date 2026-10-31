@@ -57,7 +57,7 @@ std::unique_ptr<sd::Block> makeSeparatorMimic() {
 
 std::unique_ptr<sd::Block> makePlaceholder(const std::string& url) {
     auto b = newBlock(sd::Block::Kind::Paragraph);
-    b->text = sd::plainText("[Изображение: " + url + "]");
+    b->text = sd::plainText("[Image: " + url + "]");
     return b;
 }
 
