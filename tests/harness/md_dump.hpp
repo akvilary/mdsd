@@ -1,6 +1,6 @@
 #pragma once
 
-// Помощники markdown-тестов: разбор и дамп инлайн-элементов в сравнимую строку.
+// Markdown test helpers: parsing and dumping inline elements into a comparable string.
 
 #include <gtest/gtest.h>
 
@@ -11,9 +11,10 @@
 
 namespace test {
 
+/// Parse markdown source text into a document.
 inline md::Document parseMd(const std::string& s) { return md::parseMarkdown(s); }
 
-// Дамп runs: "[текст|BISUC|ссылка]"; картинки — "(img:url)".
+/// Dump runs as "[text|BISUC|link]"; images are dumped as "(img:url)".
 inline std::string runsDump(const std::vector<md::InlineElement>& elems) {
     std::string out;
     for (const auto& e : elems) {
@@ -44,12 +45,12 @@ inline std::string runsDump(const std::vector<md::InlineElement>& elems) {
     return out;
 }
 
-// Инлайн-проверка: одиночный абзац из src должен дать ровно want.
+/// Inline check: a single paragraph parsed from src must produce exactly want.
 inline void checkInline(const char* src, const std::string& want) {
     md::Document d = parseMd(src);
-    ASSERT_EQ(d.blocks.size(), 1u) << "источник: " << src;
-    ASSERT_EQ(d.blocks[0]->type, md::Block::Type::Paragraph) << "источник: " << src;
-    EXPECT_EQ(runsDump(d.blocks[0]->inlines), want) << "источник: " << src;
+    ASSERT_EQ(d.blocks.size(), 1u) << "source: " << src;
+    ASSERT_EQ(d.blocks[0]->type, md::Block::Type::Paragraph) << "source: " << src;
+    EXPECT_EQ(runsDump(d.blocks[0]->inlines), want) << "source: " << src;
 }
 
 } // namespace test

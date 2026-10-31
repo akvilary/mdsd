@@ -98,7 +98,7 @@ std::string ZipWriter::finish() {
         // Local file header
         put32(out, 0x04034b50);
         put16(out, 20);     // version needed
-        put16(out, 0x0800); // flags: имена в UTF-8
+        put16(out, 0x0800); // flags: names in UTF-8
         put16(out, 0);      // method: store
         put16(out, e.dosTime);
         put16(out, e.dosDate);

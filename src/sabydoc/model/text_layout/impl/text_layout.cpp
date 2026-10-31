@@ -32,7 +32,7 @@ Signature signatureOf(const md::InlineRun& r) {
 } // namespace
 
 Text buildText(const std::vector<md::InlineElement>& elems) {
-    // Нормализация входа: картинка -> alt/url, '\n' -> ' '
+    // Input normalization: image -> alt/url, '\n' -> ' '
     std::vector<md::InlineRun> runs;
     runs.reserve(elems.size());
     for (const md::InlineElement& e : elems) {
@@ -56,7 +56,7 @@ Text buildText(const std::vector<md::InlineElement>& elems) {
 
     Text out;
     if (runs.empty()) {
-        return out; // пустой текст
+        return out; // empty text
     }
 
     out.content.reserve(64);

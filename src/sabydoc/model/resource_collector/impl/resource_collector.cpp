@@ -41,7 +41,7 @@ std::string sanitizeName(const std::string& name) {
     if (asciiSafeName(name)) {
         return name;
     }
-    // расширение оставляем, если оно безопасно
+    // keep the extension when it is safe
     std::string ext;
     const size_t dot = name.find_last_of('.');
     if (dot != std::string::npos) {
@@ -117,7 +117,7 @@ std::string ResourceCollector::addImage(const std::string& url, unsigned& width,
     r.fileName = p.filename().string();
     r.fileId = makeUuid4();
     r.zipName = sanitizeName(r.fileName);
-    // уникальность имени внутри архива
+    // uniqueness of the name inside the archive
     if (mUsedZipNames.contains(r.zipName)) {
         const size_t dot = r.zipName.find_last_of('.');
         const std::string stem = (dot == std::string::npos) ? r.zipName : r.zipName.substr(0, dot);

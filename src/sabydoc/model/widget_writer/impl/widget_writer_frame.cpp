@@ -1,4 +1,4 @@
-// Сборка каркаса: frame (elementMetaTypes + resources), documentLayout, оглавление.
+// Frame assembly: frame (elementMetaTypes + resources), documentLayout, table of contents.
 
 #include "sabydoc/model/widget_writer/widget_writer.hpp"
 #include "sabydoc/model/widget_writer/widget_io.hpp"
@@ -89,7 +89,7 @@ struct TocLinks {
     std::vector<char> hasChild;
 };
 
-// parentId по стеку уровней (как в редакторе), hasChild согласован с детьми
+// parentId via a level stack (as in the editor); hasChild is consistent with the children
 TocLinks computeTocLinks(const std::vector<TocHeader>& headers) {
     TocLinks links{std::vector<int>(headers.size(), -1), std::vector<char>(headers.size(), 0)};
     std::vector<int> stack;

@@ -1,4 +1,4 @@
-// Сериализация таблиц: columnsConfigs, строки, ячейки с абзацами и выравниванием.
+// Table serialization: columnsConfigs, rows, cells with paragraphs and alignment.
 
 #include <span>
 

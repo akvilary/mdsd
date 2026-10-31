@@ -2,6 +2,7 @@
 
 #include <string>
 
-// Генерация случайного UUID v4 (для id виджетов и file_id ресурсов).
-// Не потокобезопасно (одинокий static движок); инструмент однопоточный.
+/// \brief Generates a random UUID v4 string (for widget ids and resource file_id).
+/// Not thread-safe (a lone static engine); the tool is single-threaded.
+/// \return The UUID v4 in canonical string form.
 std::string makeUuid4();

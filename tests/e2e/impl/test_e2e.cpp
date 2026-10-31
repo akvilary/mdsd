@@ -1,4 +1,4 @@
-// Конец-в-конец: markdown -> маппинг -> архив; диагностики, TOC, политика разделителей.
+// End-to-end: markdown -> mapping -> archive; diagnostics, TOC, separator policy.
 
 #include <gtest/gtest.h>
 
@@ -14,7 +14,7 @@
 
 namespace {
 
-// Маленький документ со всеми ключевыми видами блоков (включая несуществующую картинку)
+// Small document with all key block kinds (including a nonexistent image)
 sd::Document makeSampleDoc(std::vector<std::string>& diags, ResourceCollector& rc) {
     md::Document doc = test::parseMd(
         "# Заголовок\n\nТекст с **жирным** и [ссылкой](https://e.com).\n\n- пункт\n  - "
@@ -54,7 +54,7 @@ TEST(E2e, WarnsOnMissingImage) {
     EXPECT_TRUE(found);
 }
 
-// После списка/таблицы/кода/цитаты/линии — пустой абзац-разделитель
+// After a list/table/code/quote/rule — an empty separator paragraph
 TEST(E2e, SeparatorPolicy) {
     std::vector<std::string> diags;
     ResourceCollector rc(std::filesystem::path("/nonexistent"), diags);

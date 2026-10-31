@@ -1,5 +1,5 @@
-// Тесты JSON-выхлопа на nlohmann::ordered_json: порядок ключей, экранирование,
-// UTF-8 без ASCII-экранирования — контракты, на которые опирается байт-дифф с эталоном.
+// Tests of JSON output via nlohmann::ordered_json: key order, escaping,
+// UTF-8 without ASCII escaping — contracts the byte-diff against the reference relies on.
 
 #include <gtest/gtest.h>
 
@@ -14,7 +14,7 @@ using Json = nlohmann::ordered_json;
 TEST(JsonOutput, PreservesInsertionOrder) {
     Json o = Json::object();
     o["б"] = 1;
-    o["а"] = 2; // не сортируется — порядок вставки
+    o["а"] = 2; // not sorted — insertion order
     EXPECT_EQ(o.dump(), "{\"б\":1,\"а\":2}");
 }
 
@@ -29,8 +29,8 @@ TEST(JsonOutput, EscapesQuotesNewlinesAndControlChars) {
 TEST(JsonOutput, Utf8PassesThroughUnescaped) {
     const Json j = "Текст 🚀 и 👌";
     const std::string d = j.dump();
-    EXPECT_EQ(d.find("\\u"), std::string::npos);           // нет ASCII-экранирования
-    EXPECT_NE(d.find("Текст 🚀 и 👌"), std::string::npos); // UTF-8 как есть
+    EXPECT_EQ(d.find("\\u"), std::string::npos);           // no ASCII escaping
+    EXPECT_NE(d.find("Текст 🚀 и 👌"), std::string::npos); // UTF-8 passes through as-is
 }
 
 TEST(JsonOutput, CompactDumpWithoutSpaces) {
@@ -42,7 +42,7 @@ TEST(JsonOutput, CompactDumpWithoutSpaces) {
 }
 
 TEST(JsonOutput, TwoElementArraysNeedExplicitArray) {
-    // регрессия ловушки: {"тег", {attrs}} без Json::array станет объектом
+    // trap regression: {"tag", {attrs}} without Json::array becomes an object
     const Json node = Json::array({"tag", Json{{"id", 1}}});
     ASSERT_TRUE(node.is_array());
     ASSERT_EQ(node.size(), 2u);

@@ -1,4 +1,4 @@
-// Сериализация простых виджетов: заголовки, абзацы, код, цитаты, списки, картинки, разделители.
+// Serialization of simple widgets: headers, paragraphs, code, quotes, lists, images, separators.
 
 #include <span>
 
@@ -30,7 +30,7 @@ Json writeCode(const Block& b) {
     Json attrs = Json::object();
     attrs["id"] = b.id;
     attrs["value"] = b.code;
-    attrs["valueWithTokens"] = b.code; // без подсветки: токены = чистый текст (согласовано)
+    attrs["valueWithTokens"] = b.code; // no highlighting: tokens = plain text (agreed)
     return Json::array({"ModuleEditor/codeBlock:View", std::move(attrs)});
 }
 
@@ -70,7 +70,7 @@ Json writeListItem(const ListItem& item) {
         {"ModuleEditor/list:Item", std::move(itemAttrs), writeListItemContent(item.content)});
     for (const BlockPtr& child : item.children) {
         if (child->kind == Block::Kind::Paragraph) {
-            itemNode.push_back(writeListItemContent(child->text)); // доп. абзац пункта
+            itemNode.push_back(writeListItemContent(child->text)); // extra paragraph of the item
         } else {
             itemNode.push_back(writeBlockValue(*child));
         }

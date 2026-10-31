@@ -86,7 +86,7 @@ ImageSize probeJpeg(const unsigned char* p, size_t n) {
             return s;
         }
         if (marker == 0xD9 || marker == 0xDA) {
-            break; // начались данные — размеры не нашли
+            break; // scan data began — dimensions not found
         }
         if (segLen < 2) {
             break;

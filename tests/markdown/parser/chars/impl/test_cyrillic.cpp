@@ -1,8 +1,7 @@
-// Тесты работы с кириллицей (UTF-8) во всех подсистемах парсера.
-// Инвариант: ASCII-разделители (0x00-0x7F) никогда не встречаются внутри
-// кириллических UTF-8 последовательностей (ведущий байт 0xD0-0xD1 +
-// байты-продолжения 0x80-0xBF), поэтому байтовые операции на ASCII-границах
-// не могут разрезать кириллицу. Эти тесты проверяют это на практике.
+// Tests of Cyrillic (UTF-8) handling across all parser subsystems.
+// Invariant: ASCII delimiters (0x00-0x7F) never occur inside Cyrillic UTF-8
+// sequences (leading byte 0xD0-0xD1 + continuation bytes 0x80-0xBF), so byte
+// operations at ASCII boundaries cannot split Cyrillic apart. These tests verify it in practice.
 
 #include <gtest/gtest.h>
 
@@ -17,7 +16,7 @@ using test::checkInline;
 using test::parseMd;
 using test::runsDump;
 
-// --- Инлайн: кириллица вокруг разделителей акцента ---
+// --- Inline: Cyrillic around emphasis delimiters ---
 
 TEST(Cyrillic, EmphasisAroundCyrillic) {
     checkInline("**жирный**", "[жирный|B|]");
@@ -27,27 +26,27 @@ TEST(Cyrillic, EmphasisAroundCyrillic) {
     checkInline("обычный текст без акцента", "[обычный текст без акцента||]");
 }
 
-// Кириллица перед _ — словесный символ, `_` не опенер (правило CommonMark)
+// Cyrillic before _ is a word character, `_` is not an opener (CommonMark rule)
 TEST(Cyrillic, UnderscoreAfterCyrillicIsWord) {
     checkInline("начало_конец", "[начало_конец||]");
     checkInline("внутри_слова_тоже", "[внутри_слова_тоже||]");
-    // но с пробелами — работает
+    // but with spaces it works
     checkInline("_курсив_", "[курсив|I|]");
 }
 
-// Смешанный: кириллица + ASCII + эмодзи
+// Mixed: Cyrillic + ASCII + emoji
 TEST(Cyrillic, MixedScripts) {
     checkInline("**Русский English 日本語**", "[Русский English 日本語|B|]");
     checkInline("текст с **жирным** и `кодом` и [ссылкой](https://ru.ру)",
                 "[текст с ||][жирным|B|][ и ||][кодом|C|][ и ||][ссылкой||https://ru.ру]");
 }
 
-// --- Ссылки с кириллическими текстами и адресами ---
+// --- Links with Cyrillic text and URLs ---
 
 TEST(Cyrillic, LinksAndImages) {
     checkInline("[Ссылка на русский сайт](https://ru.wikipedia.org)",
                 "[Ссылка на русский сайт||https://ru.wikipedia.org]");
-    // alt-текст картинки живёт в image.alt, не в отдельном Run
+    // the image alt text lives in image.alt, not in a separate Run
     const md::Document d = parseMd("![Кириллическая подпись](картинка.png)");
     ASSERT_EQ(d.blocks.size(), 1u);
     ASSERT_EQ(d.blocks[0]->inlines.size(), 1u);
@@ -56,17 +55,17 @@ TEST(Cyrillic, LinksAndImages) {
     EXPECT_EQ(d.blocks[0]->inlines[0].image.alt, "Кириллическая подпись");
 }
 
-// --- Заголовки с кириллицей ---
+// --- Headers with Cyrillic ---
 
 TEST(Cyrillic, HeadersAndSetext) {
     const md::Document d = parseMd("# Русский заголовок\n\nЗаголовок сетекстом\n===");
     ASSERT_EQ(d.blocks.size(), 2u);
     EXPECT_EQ(d.blocks[0]->level, 1);
     EXPECT_EQ(test::runsDump(d.blocks[0]->inlines), "[Русский заголовок||]");
-    EXPECT_EQ(d.blocks[1]->level, 1); // setext из "=" после кириллического абзаца
+    EXPECT_EQ(d.blocks[1]->level, 1); // setext from "=" after a Cyrillic paragraph
 }
 
-// --- Таблицы с кириллицей и экранированными пайпами ---
+// --- Tables with Cyrillic and escaped pipes ---
 
 TEST(Cyrillic, TableWithCyrillicAndEscapedPipes) {
     const md::Document d = parseMd(
@@ -78,21 +77,21 @@ TEST(Cyrillic, TableWithCyrillicAndEscapedPipes) {
     EXPECT_EQ(md::plainText(d.blocks[0]->rows[1][0]), "Значение с | пайпом");
 }
 
-// --- Цитаты со вложенностью и кириллицей ---
+// --- Quotes with nesting and Cyrillic ---
 
 TEST(Cyrillic, QuotesWithCyrillic) {
-    // после пустой строки «хвост» — отдельный абзац (корректно по CommonMark)
+    // after a blank line, "хвост" is a separate paragraph (correct per CommonMark)
     const md::Document d = parseMd("> Кириллическая цитата\n> > Вложенная\n\nхвост");
     ASSERT_EQ(d.blocks.size(), 2u);
     EXPECT_EQ(d.blocks[0]->type, md::Block::Type::Quote);
     EXPECT_EQ(d.blocks[1]->type, md::Block::Type::Paragraph);
 }
 
-// --- text_layout: UTF-16 offsets для смешанного кириллица + эмодзи ---
+// --- text_layout: UTF-16 offsets for mixed Cyrillic + emoji ---
 
 TEST(Cyrillic, TextLayoutU16OffsetsMixedScripts) {
-    // "Привет" (6 кириллических = 6 u16) + " " (1) + "🚀" (1 астральный = 2 u16)
-    // + " " (1) + "мир" (3 кириллических = 3 u16) = 13 u16
+    // "Привет" (6 Cyrillic chars = 6 u16) + " " (1) + "🚀" (1 astral = 2 u16)
+    // + " " (1) + "мир" (3 Cyrillic chars = 3 u16) = 13 u16
     const std::string text = "Привет \xF0\x9F\x9A\x80 мир";
     const size_t expected = 6 + 1 + 2 + 1 + 3; // = 13
     auto makeElem = [](const std::string& s) {
@@ -105,7 +104,7 @@ TEST(Cyrillic, TextLayoutU16OffsetsMixedScripts) {
     EXPECT_EQ(result.formats[0].length, expected);
 }
 
-// --- text_layout: жирный кириллический текст — offset/length правильно ---
+// --- text_layout: bold Cyrillic text — correct offset/length ---
 
 TEST(Cyrillic, TextLayoutBoldCyrillicOffsets) {
     md::StyleFlags bold;
@@ -121,13 +120,13 @@ TEST(Cyrillic, TextLayoutBoldCyrillicOffsets) {
     EXPECT_EQ(t.formats[0].length, 3u);
     EXPECT_EQ(t.formats[1].offset, 3u);  // "Жирный" = 6 u16
     EXPECT_EQ(t.formats[1].length, 6u);
-    EXPECT_FALSE(t.formats[1].bold == false); // жирный
+    EXPECT_FALSE(t.formats[1].bold == false); // bold
     EXPECT_EQ(t.formats[2].offset, 9u);  // "После" = 5 u16
     EXPECT_EQ(t.formats[2].length, 5u);
     EXPECT_TRUE(t.formats[2].length == 5u);
 }
 
-// --- Front matter и task-листы с кириллицей ---
+// --- Front matter and task lists with Cyrillic ---
 
 TEST(Cyrillic, FrontMatterAndTaskLists) {
     const md::Document d = parseMd("---\ntitle: Русский заголовок\n---\n\n- [x] Выполнено\n- [ ] Не выполнено");
@@ -138,7 +137,7 @@ TEST(Cyrillic, FrontMatterAndTaskLists) {
     EXPECT_EQ(md::plainText(d.blocks[0]->items[1].content), "Не выполнено");
 }
 
-// --- Код-блоки с кириллицей внутри ---
+// --- Code blocks with Cyrillic inside ---
 
 TEST(Cyrillic, CodeBlockWithCyrillic) {
     const md::Document d = parseMd("```\n// Кириллический комментарий\nlet x = 1;\n```");
@@ -146,14 +145,14 @@ TEST(Cyrillic, CodeBlockWithCyrillic) {
     EXPECT_EQ(d.blocks[0]->codeText, "// Кириллический комментарий\nlet x = 1;");
 }
 
-// --- Спойлеры экранирования: кириллица перед бэкслэшем ---
+// --- Escape gotchas: Cyrillic before a backslash ---
 
 TEST(Cyrillic, EscapesWithCyrillic) {
     checkInline("кириллица\\*не акцент\\*", "[кириллица*не акцент*||]");
     checkInline("текст\\_с экранированием\\_", "[текст_с экранированием_||]");
 }
 
-// --- Списки: вложенность с кириллицей ---
+// --- Lists: nesting with Cyrillic ---
 
 TEST(Cyrillic, NestedListCyrillic) {
     const md::Document d = parseMd("- Первый\n  - Второй уровень\n    - Третий\n- Четвёртый");
@@ -164,7 +163,7 @@ TEST(Cyrillic, NestedListCyrillic) {
     EXPECT_EQ(md::plainText(d.blocks[0]->items[0].children[0]->items[0].content), "Второй уровень");
 }
 
-// --- Горизонтальная линия после кириллического абзаца (не setext) ---
+// --- Horizontal rule after a Cyrillic paragraph (not setext) ---
 
 TEST(Cyrillic, HrAfterCyrillicParagraph) {
     const md::Document d = parseMd("Кириллический абзац\n\n---");
@@ -172,7 +171,7 @@ TEST(Cyrillic, HrAfterCyrillicParagraph) {
     EXPECT_EQ(d.blocks[1]->type, md::Block::Type::Rule);
 }
 
-// --- HTML-теги с кириллицей внутри ---
+// --- HTML tags with Cyrillic inside ---
 
 TEST(Cyrillic, HtmlTagsWithCyrillicContent) {
     checkInline("<b>Жирный кириллицей</b>", "[Жирный кириллицей|B|]");

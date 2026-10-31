@@ -1,5 +1,5 @@
-// Тесты инлайнового парсера: акцент, код-спаны, ссылки, сущности, картинки.
-// Векторы — из прототипной проверки алгоритмов (раунды ревью).
+// Inline parser tests: emphasis, code spans, links, entities, images.
+// Test vectors come from prototype verification of the algorithms (review rounds).
 
 #include <gtest/gtest.h>
 
@@ -18,7 +18,7 @@ TEST(Inline, Emphasis) {
     checkInline("a*b*c", "[a||][b|I|][c||]");
     checkInline("_ital_", "[ital|I|]");
     checkInline("~~**x**~~", "[x|BS|]");
-    // незакрытые и не-эмфазы
+    // unclosed and non-emphasis markers
     checkInline("**x", "[**x||]");
     checkInline("a * b * c", "[a * b * c||]");
     checkInline("snake_case_x", "[snake_case_x||]");
@@ -26,13 +26,13 @@ TEST(Inline, Emphasis) {
 
 TEST(Inline, Strike) {
     checkInline("~~x~~", "[x|S|]");
-    checkInline("~x~", "[~x~||]"); // одинарная тильда — не зачёркивание
+    checkInline("~x~", "[~x~||]"); // a single tilde is not strikethrough
 }
 
 TEST(Inline, CodeSpans) {
     checkInline("a `code` b", "[a ||][code|C|][ b||]");
     checkInline("``a`b``", "[a`b|C|]");
-    checkInline("` spaced `", "[spaced|C|]"); // обрезка одного пробела по CM
+    checkInline("` spaced `", "[spaced|C|]"); // single space trimmed per CM
 }
 
 TEST(Inline, HtmlTags) {
@@ -44,11 +44,11 @@ TEST(Inline, HtmlTags) {
 TEST(Inline, Links) {
     checkInline("[ссылка](https://e.com)", "[ссылка||https://e.com]");
     checkInline("[к][r]\n\n[r]: https://e.com \"T\"",
-                "[к||https://e.com]"); // def после использования
+                "[к||https://e.com]"); // definition after use
     checkInline("<https://e.com>", "[https://e.com||https://e.com]");
     checkInline("го https://e.com/x, дальше",
-                "[го ||][https://e.com/x||https://e.com/x][, дальше||]"); // хвостовая пунктуация
-    // в угловых скобках пробелы допустимы (CommonMark)
+                "[го ||][https://e.com/x||https://e.com/x][, дальше||]"); // trailing punctuation
+    // spaces are allowed inside angle brackets (CommonMark)
     checkInline("[br][]\n\n[br]: <https://e.com/a b> \"T\"", "[br||https://e.com/a b]");
 }
 

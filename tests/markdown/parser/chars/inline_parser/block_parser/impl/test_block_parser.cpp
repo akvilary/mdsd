@@ -1,5 +1,5 @@
-// Тесты блочного парсера: заголовки, списки, цитаты, таблицы, код, переносы.
-// Включая регрессии раундов ревью (гварды, GFM-таблица поверх абзаца и т.д.).
+// Block parser tests: headers, lists, quotes, tables, code, line breaks.
+// Includes regressions from code review rounds (guards, GFM table over a paragraph, etc.).
 
 #include <gtest/gtest.h>
 
@@ -53,7 +53,7 @@ TEST(BlockParser, NestedList) {
     EXPECT_EQ(items[0].children[0]->items.size(), 2u);
 }
 
-// Гвард ленивого продолжения: текст после подсписка закрывает список
+// Lazy continuation guard: text after a sublist closes the list
 TEST(BlockParser, LazyContinuationGuard) {
     const md::Document d = parseMd("- item\n  - sub\ntext");
     ASSERT_EQ(d.blocks.size(), 2u);
@@ -68,7 +68,7 @@ TEST(BlockParser, LazyContinuationAttaches) {
     EXPECT_EQ(runsDump(d.blocks[0]->items[0].content), "[item продолжение||]");
 }
 
-// >4 пробелов после маркера: контент сохраняет излишек (код в пункте)
+// >4 spaces after the marker: content keeps the excess (code inside an item)
 TEST(BlockParser, SpacesAfterMarker) {
     const md::Document d = parseMd("-     code");
     ASSERT_EQ(d.blocks.size(), 1u);
@@ -84,7 +84,7 @@ TEST(BlockParser, TaskList) {
     EXPECT_EQ(d.blocks[0]->listKind, md::ListKind::Task);
     EXPECT_FALSE(d.blocks[0]->items[0].checked);
     EXPECT_TRUE(d.blocks[0]->items[1].checked);
-    EXPECT_EQ(runsDump(d.blocks[0]->items[0].content), "[первый||]"); // префикс снят
+    EXPECT_EQ(runsDump(d.blocks[0]->items[0].content), "[первый||]"); // task prefix stripped
 }
 
 TEST(BlockParser, LooseListStaysOneList) {
@@ -93,12 +93,12 @@ TEST(BlockParser, LooseListStaysOneList) {
     EXPECT_EQ(d.blocks[0]->items.size(), 2u);
 }
 
-// «хвост» по CM лениво продолжается во вложенную цитату — верхнеуровневый блок один
+// per CM, "хвост" lazily continues into the nested quote — a single top-level block
 TEST(BlockParser, QuoteWithNestingAndLazyTail) {
     const md::Document d = parseMd("> первый\n\n> второй\n> > вложенный\nхвост");
     ASSERT_EQ(d.blocks.size(), 1u);
     EXPECT_EQ(d.blocks[0]->type, md::Block::Type::Quote);
-    ASSERT_EQ(d.blocks[0]->children.size(), 3u); // абзац + абзац + вложенная цитата
+    ASSERT_EQ(d.blocks[0]->children.size(), 3u); // paragraph + paragraph + nested quote
     EXPECT_EQ(d.blocks[0]->children[2]->type, md::Block::Type::Quote);
     EXPECT_EQ(d.blocks[0]->children[0]->type, md::Block::Type::Paragraph);
 }
@@ -140,7 +140,7 @@ TEST(BlockParser, HtmlAlign) {
 }
 
 TEST(BlockParser, HardBreaks) {
-    const md::Document d = parseMd("первая  \nвторая"); // два пробела в конце
+    const md::Document d = parseMd("первая  \nвторая"); // two trailing spaces
     ASSERT_EQ(d.blocks.size(), 1u);
     EXPECT_EQ(md::plainText(d.blocks[0]->inlines), "первая\nвторая");
 }
@@ -152,18 +152,18 @@ TEST(BlockParser, FrontMatter) {
     EXPECT_EQ(d.blocks[0]->type, md::Block::Type::Header);
 }
 
-// --- регрессии раундов ревью кода ---
+// --- code review round regressions ---
 
-// GFM: разделитель превращает последнюю строку абзаца в шапку таблицы
+// GFM: a delimiter row turns the paragraph's last line into a table header
 TEST(BlockParser, GfmTableInterruptsParagraph) {
     const md::Document d = parseMd("Раздел | Глава\n- | -\n1 | 2");
     ASSERT_EQ(d.blocks.size(), 1u);
     ASSERT_EQ(d.blocks[0]->type, md::Block::Type::Table);
-    ASSERT_EQ(d.blocks[0]->rows.size(), 2u); // шапка + 1 строка тела
+    ASSERT_EQ(d.blocks[0]->rows.size(), 2u); // header + 1 body row
     EXPECT_EQ(md::plainText(d.blocks[0]->rows[0][0]), "Раздел");
 }
 
-// нумерованный список прерывает абзац только начиная с 1 (CommonMark)
+// an ordered list interrupts a paragraph only when starting at 1 (CommonMark)
 TEST(BlockParser, OrderedTenDoesNotInterrupt) {
     const md::Document d = parseMd("текст\n10. пункт");
     ASSERT_EQ(d.blocks.size(), 1u);
@@ -171,7 +171,7 @@ TEST(BlockParser, OrderedTenDoesNotInterrupt) {
     EXPECT_EQ(md::plainText(d.blocks[0]->inlines), "текст 10. пункт");
 }
 
-// чётное число обратных слэшей — экранированная пара, НЕ жёсткий перенос
+// an even number of backslashes is an escaped pair, NOT a hard break
 TEST(BlockParser, EvenBackslashesAreEscaped) {
     const md::Document d = parseMd("x\\\\\ny");
     ASSERT_EQ(d.blocks.size(), 1u);
@@ -184,7 +184,7 @@ TEST(BlockParser, OddBackslashIsHardBreak) {
     EXPECT_EQ(md::plainText(d.blocks[0]->inlines), "a\nb");
 }
 
-// data-align не считается align (проверка границ имени атрибута)
+// data-align does not count as align (attribute name boundary check)
 TEST(BlockParser, DataAlignIgnored) {
     const md::Document d = parseMd("<div data-align=\"center\">текст</div>");
     ASSERT_EQ(d.blocks.size(), 1u);

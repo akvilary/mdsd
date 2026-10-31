@@ -2,9 +2,9 @@
 
 #include <utf8.h>
 
-// Фасад над utf8cpp (nemtrif/utfcpp): декодирование и валидация — библиотека;
-// семантика u16-единиц (String.length в JS) и шаг-1-байт-на-ошибку — наша,
-// это контракт формата SabyDoc и точка правды.
+// Facade over utf8cpp (nemtrif/utfcpp): decoding and validation belong to the library;
+// the u16 code unit semantics (String.length in JS) and the one-byte-step-on-error
+// behavior are ours — this is the SabyDoc format contract and the point of truth.
 namespace utf8 {
 
 char32_t decode(const std::string& s, size_t& i, bool* ok) {
@@ -27,7 +27,7 @@ char32_t decode(const std::string& s, size_t& i, bool* ok) {
         if (ok) {
             *ok = false;
         }
-        i = start + 1; // битая последовательность: +1 байт, замещающий символ
+        i = start + 1; // broken sequence: +1 byte, replacement character
         return 0xFFFD;
     }
 }

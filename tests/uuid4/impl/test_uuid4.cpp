@@ -1,4 +1,4 @@
-// Тесты генератора UUID v4: форма, версия/вариант, отсутствие коллизий.
+// UUID v4 generator tests: shape, version/variant, absence of collisions.
 
 #include <gtest/gtest.h>
 
@@ -18,8 +18,8 @@ TEST(Uuid4, ShapeAndVersion) {
     EXPECT_EQ(u[13], '-');
     EXPECT_EQ(u[18], '-');
     EXPECT_EQ(u[23], '-');
-    EXPECT_EQ(u[14], '4');                          // версия
-    EXPECT_NE(std::strchr("89ab", u[19]), nullptr); // вариант
+    EXPECT_EQ(u[14], '4');                          // version
+    EXPECT_NE(std::strchr("89ab", u[19]), nullptr); // variant
 }
 
 TEST(Uuid4, NoCollisions) {

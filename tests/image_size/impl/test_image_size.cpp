@@ -1,4 +1,4 @@
-// Тесты сниффера размеров изображений на синтетических заголовках.
+// Tests of the image size sniffer on synthetic headers.
 
 #include <gtest/gtest.h>
 
@@ -9,7 +9,7 @@
 namespace {
 
 TEST(ImageSize, Png) {
-    // сигнатура + IHDR 5x3
+    // signature + IHDR 5x3
     const std::string png =
         std::string("\x89PNG\r\n\x1A\n", 8) + std::string("\x00\x00\x00\x0DIHDR", 8) +
         std::string("\x00\x00\x00\x05\x00\x00\x00\x03", 8) + std::string(16, '\0');

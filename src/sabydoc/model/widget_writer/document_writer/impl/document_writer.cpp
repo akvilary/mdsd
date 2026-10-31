@@ -1,4 +1,4 @@
-// Сборка итогового .sabydoc (ZIP store) из модели: content.json + index.site + ресурсы.
+// Assembly of the final .sabydoc archive (ZIP store) from the model: content.json + index.site + resources.
 
 #include <nlohmann/json.hpp>
 

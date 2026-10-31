@@ -1,5 +1,5 @@
-// Сериализация formattedText: свойства, диапазоны [offset, length] (UTF-16),
-// якорные тройки ссылок, пустая форма с children:"".
+// formattedText serialization: properties, [offset, length] ranges (UTF-16),
+// link anchor triples, and the empty form with children:"".
 
 #include "sabydoc/model/widget_writer/widget_io.hpp"
 #include "uuid4/uuid4.hpp"
@@ -44,7 +44,7 @@ Json formatsArray(const Text& t) {
             continue;
         }
         if (!r.href.empty()) {
-            // якорная тройка как в редакторе: [s,0,{}], [s,len,{href}], [s+len,0,{}]
+            // anchor triple as in the editor: [s,0,{}], [s,len,{href}], [s+len,0,{}]
             formats.push_back(Json::array({r.offset, 0, Json::object()}));
             formats.push_back(Json::array({r.offset, r.length, propsObject(r)}));
             formats.push_back(Json::array({r.offset + r.length, 0, Json::object()}));
@@ -82,7 +82,7 @@ Json writeFormattedText(const Text& t) {
         if (t.emptyColor1) {
             props["color"] = "color1";
         }
-        attrs["formats"] = Json::array({Json::array({0, 0, std::move(props)})}); // вложенная тройка
+        attrs["formats"] = Json::array({Json::array({0, 0, std::move(props)})}); // nested triple
     } else {
         attrs["formats"] = formatsArray(t);
     }

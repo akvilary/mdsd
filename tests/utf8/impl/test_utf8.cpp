@@ -1,4 +1,4 @@
-// Тесты utf8: декодирование, u16-подсчёт, санитизация.
+// utf8 tests: decoding, u16 counting, sanitization.
 
 #include <gtest/gtest.h>
 
@@ -26,7 +26,7 @@ TEST(Utf8, CountsAstralAsTwoUnits) {
 
 TEST(Utf8, SanitizesBrokenSequences) {
     std::string bad = "a\xFF\xC2z";
-    bad += "\xE0\x80"; // обрыв 3-байтной последовательности
+    bad += "\xE0\x80"; // truncated 3-byte sequence
     const size_t replaced = utf8::sanitize(bad);
     EXPECT_GE(replaced, 2u);
     EXPECT_GE(utf8::u16length(bad), 3u);

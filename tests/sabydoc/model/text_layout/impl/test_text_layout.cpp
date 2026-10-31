@@ -1,4 +1,4 @@
-// Тесты text_layout: u16-диапазоны formats, слияние, alt картинок, flatten.
+// text_layout tests: u16 format ranges, merging, image alt text, flatten.
 
 #include <gtest/gtest.h>
 
@@ -15,7 +15,7 @@ md::InlineElement run(std::string t, md::StyleFlags st = {}, std::string link = 
                              md::InlineRun{std::move(t), st, std::move(link)}, md::InlineImage{}};
 }
 
-// Вектор из прототипной проверки: "Текст " + жирная ссылка "🚀 ссылка" + курсивный " хвост"
+// Vector from prototype verification: "Текст " + bold link "🚀 ссылка" + italic " хвост"
 TEST(TextLayout, U16OffsetsWithAstralAndLink) {
     md::StyleFlags bold, ital;
     bold.bold = true;

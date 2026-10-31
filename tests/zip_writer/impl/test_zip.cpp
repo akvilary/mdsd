@@ -1,4 +1,4 @@
-// Тесты zip: структура архива, CRC-вектор, защита от повторного finish/addFile.
+// zip tests: archive structure, CRC vector, protection against repeated finish/addFile.
 
 #include <gtest/gtest.h>
 
