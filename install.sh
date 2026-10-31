@@ -3,16 +3,17 @@
 # in the project directory (same as the script itself).
 # Minimum supported standard: C++20.
 #
-#   bash install.sh              — build (incremental) and place ./mdsd at project root
+#   bash install.sh              — build + install (root: /usr/local; otherwise ~/.local)
+#   bash install.sh build        — build only, place ./mdsd at project root
 #   bash install.sh test         — build and run unit tests (ctest)
-#   bash install.sh install      — install (root: /usr/local; otherwise ~/.local; PREFIX=... overrides)
+#   bash install.sh install      — explicit install
 #   bash install.sh uninstall    — remove installed files (via install_manifest.txt)
 #   bash install.sh clean        — remove build/
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="$SCRIPT_DIR/build"
-CMD="${1:-build}"
+CMD="${1:-install}"
 
 pick_compiler() {
   if [[ -n "${CXX:-}" ]]; then

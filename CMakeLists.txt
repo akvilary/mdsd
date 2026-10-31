@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(mdsd LANGUAGES CXX DESCRIPTION "Markdown <-> SabyDoc converter")
 
-set(CMAKE_CXX_STANDARD 20) # минимальная поддерживаемая версия
+set(CMAKE_CXX_STANDARD 20) # minimum supported version
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -9,26 +9,35 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-# Флаги предупреждений — только для своих целей (googletest подключается отдельно)
+# Warning flags — only for our targets (googletest is included separately)
 set(MDSD_WARN_FLAGS -Wall -Wextra -Wpedantic)
 
-# Библиотеки (header-only, через FetchContent): JSON, UTF-8, UUID.
-# Линк-зависимостей у бинарника mdsd не появляется.
-# ВАЖНО: блок обязан стоять выше add_executable — MDSD_LIB_DEPS используется при сборке mdsd.
+# Libraries (header-only, via FetchContent): JSON, UTF-8, UUID.
+# The mdsd binary gets no link-time dependencies.
+# IMPORTANT: this block must be above add_executable — MDSD_LIB_DEPS is used when building mdsd.
 include(FetchContent)
 
 set(JSON_BuildTests OFF CACHE BOOL "" FORCE)
 set(JSON_Install OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(nlohmann_json URL https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.zip)
+FetchContent_Declare(nlohmann_json
+  URL https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
 FetchContent_MakeAvailable(nlohmann_json)
 
-# include-пути задаём сами: детерминированно и без зависимости от чужого CMake
-FetchContent_Declare(utf8cpp URL https://github.com/nemtrif/utfcpp/archive/refs/tags/v4.2.1.zip)
+# Include paths are set manually: deterministic, no dependency on external CMake
+FetchContent_Declare(utf8cpp
+  URL https://github.com/nemtrif/utfcpp/archive/refs/tags/v4.2.1.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
 FetchContent_MakeAvailable(utf8cpp)
 add_library(mdsd_utf8 INTERFACE)
 target_include_directories(mdsd_utf8 INTERFACE ${utf8cpp_SOURCE_DIR}/source)
 
-FetchContent_Declare(stduuid URL https://github.com/mariusbancila/stduuid/archive/refs/tags/v1.2.3.zip)
+# Suppress third-party deprecation warnings (stduuid uses old cmake_minimum_required)
+set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
+
+FetchContent_Declare(stduuid
+  URL https://github.com/mariusbancila/stduuid/archive/refs/tags/v1.2.3.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
 FetchContent_MakeAvailable(stduuid)
 add_library(mdsd_stduuid INTERFACE)
 target_include_directories(mdsd_stduuid INTERFACE ${stduuid_SOURCE_DIR}/include)
@@ -84,6 +93,7 @@ set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
   GoogleTest
   URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_MakeAvailable(GoogleTest)
 

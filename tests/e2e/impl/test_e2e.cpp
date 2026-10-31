@@ -15,35 +15,35 @@
 namespace {
 
 // Small document with all key block kinds (including a nonexistent image)
-sd::Document makeSampleDoc(std::vector<std::string>& diags, ResourceCollector& rc) {
+sd::Document makeSampleDoc(ResourceCollector& rc) {
     md::Document doc = test::parseMd(
-        "# Заголовок\n\nТекст с **жирным** и [ссылкой](https://e.com).\n\n- пункт\n  - "
-        "вложенный\n\n"
-        "> цитата\n\n| A | B |\n|---|---:|\n| 1 | 2 |\n\n---\n\n```js\nlet a=0;\n```\n\n"
-        "- [x] готово\n\nтекст\n\nкартинка: ![подпись](none.png)\n");
+        "# Header\n\nText with **bold** and a [link](https://e.com).\n\n- item\n  - "
+        "nested\n\n"
+        "> quote\n\n| A | B |\n|---|---:|\n| 1 | 2 |\n\n---\n\n```js\nlet a=0;\n```\n\n"
+        "- [x] done\n\ntext\n\nimage: ![caption](none.png)\n");
     mapping::Options opt;
-    opt.title = "Тест";
+    opt.title = "Test";
     return mapping::map(std::move(doc), rc, opt);
 }
 
 TEST(E2e, BuildsArchive) {
     std::vector<std::string> diags;
     ResourceCollector rc(std::filesystem::path("/nonexistent"), diags);
-    const sd::Document sdoc = makeSampleDoc(diags, rc);
+    const sd::Document sdoc = makeSampleDoc(rc);
     EXPECT_GT(sd::buildSabydocArchive(sdoc).size(), 500u);
 }
 
 TEST(E2e, TocContainsHeader) {
     std::vector<std::string> diags;
     ResourceCollector rc(std::filesystem::path("/nonexistent"), diags);
-    const sd::Document sdoc = makeSampleDoc(diags, rc);
+    const sd::Document sdoc = makeSampleDoc(rc);
     EXPECT_TRUE(sd::writeTableOfContents(sdoc).is_array());
 }
 
 TEST(E2e, WarnsOnMissingImage) {
     std::vector<std::string> diags;
     ResourceCollector rc(std::filesystem::path("/nonexistent"), diags);
-    (void)makeSampleDoc(diags, rc);
+    (void)makeSampleDoc(rc);
     EXPECT_FALSE(diags.empty());
     bool found = false;
     for (const std::string& d : diags) {
@@ -58,7 +58,7 @@ TEST(E2e, WarnsOnMissingImage) {
 TEST(E2e, SeparatorPolicy) {
     std::vector<std::string> diags;
     ResourceCollector rc(std::filesystem::path("/nonexistent"), diags);
-    const sd::Document sdoc = makeSampleDoc(diags, rc);
+    const sd::Document sdoc = makeSampleDoc(rc);
     size_t separators = 0;
     for (const auto& b : sdoc.blocks) {
         if (b->kind == sd::Block::Kind::Paragraph && b->indent0) {

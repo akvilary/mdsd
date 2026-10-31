@@ -20,9 +20,9 @@ by round-trip) and `algo.hpp` (30 lines over `std::ranges`).
 ## Build
 
 ```bash
-bash install.sh            # build; binary appears at project root: ./mdsd
+bash install.sh            # build + install (root: /usr/local; otherwise ~/.local)
+bash install.sh build      # build only; binary appears at project root: ./mdsd
 bash install.sh test       # build + run unit tests (ctest)
-bash install.sh install    # install (root: /usr/local; otherwise ~/.local)
 bash install.sh uninstall  # remove installed files
 bash install.sh clean      # remove build/
 ```
