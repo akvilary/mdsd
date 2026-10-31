@@ -38,7 +38,7 @@ std::string readAttrValue(const std::string& attrs, size_t v) {
         return attrs.substr(v, (e == std::string::npos ? attrs.size() : e) - v);
     }
     size_t e = v;
-    while (e < attrs.size() && !isSpaceCh(attrs[e]) && attrs[e] != '>') { // '>' в значении запрещён
+    while (e < attrs.size() && !isSpaceCh(attrs[e]) && attrs[e] != '>') { // '>' is not allowed in the value
         ++e;
     }
     return attrs.substr(v, e - v);
@@ -79,7 +79,7 @@ std::string attrValue(const std::string& attrs, const std::string& name) {
     const std::string low = toLower(attrs);
     size_t p = 0;
     while ((p = low.find(pat, p)) != std::string::npos) {
-        // граница имени: "data-align"/"data-src" не должны матчится как align/src
+        // name boundary: "data-align"/"data-src" must not match as align/src
         const char prev = (p > 0) ? attrs[p - 1] : '\0';
         const bool boundary = prev == '\0' ||
                               (!isWordByte(static_cast<unsigned char>(prev)) && prev != '-');

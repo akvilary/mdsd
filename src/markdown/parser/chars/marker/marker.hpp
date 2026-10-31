@@ -1,19 +1,23 @@
 #pragma once
 
-// Объект «маркер списка»: -, *, +, 1., 1) и вычисление отступа контента.
+// List-marker object: -, *, +, 1., 1) and content-indent computation.
 
 #include <string>
 
 namespace md::detail {
 
+/// \brief Result of matching a list marker on a line.
 struct Marker {
-    bool ok = false;
-    bool ordered = false;
-    size_t indent = 0;
-    size_t contentIndent = 0;
-    std::string rest;
+    bool ok = false;           ///< Whether a marker was found.
+    bool ordered = false;      ///< True for ordered markers (1. / 1)), false for bullets.
+    size_t indent = 0;         ///< Indentation of the marker itself.
+    size_t contentIndent = 0;  ///< Indent at which the item content starts.
+    std::string rest;          ///< Remaining line content after the marker.
 };
 
+/// \brief Matches a list marker at the start of a line.
+/// \param line Source line.
+/// \return Parsed marker; ok == false when the line does not start a list item.
 Marker matchListMarker(const std::string& line);
 
 } // namespace md::detail

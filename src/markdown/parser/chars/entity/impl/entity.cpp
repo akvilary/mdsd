@@ -33,7 +33,7 @@ bool decodeNumericEntity(const std::string& body, std::string& out, size_t& end,
         return false;
     }
     end = sc + 1;
-    utf8::append(static_cast<char32_t>(cp), std::back_inserter(out)); // кодирование — библиотека
+    utf8::append(static_cast<char32_t>(cp), std::back_inserter(out)); // encoding is done by the library
     return true;
 }
 

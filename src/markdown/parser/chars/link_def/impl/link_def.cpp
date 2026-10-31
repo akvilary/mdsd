@@ -27,8 +27,8 @@ std::string normalizeLabel(std::string s) {
 
 namespace {
 
-// Начало адреса: <...> (пробелы внутри допустимы) или «до первого пробела».
-// Продвигает v за адрес; false — некорректная угловая форма.
+// Start of a destination: <...> (spaces allowed inside) or "up to the first space".
+// Advances v past the destination; returns false for a malformed angle form.
 bool takeUrl(std::string_view& v, std::string& url) {
     if (!v.empty() && v.front() == '<') {
         const size_t gt = v.find('>', 1);
@@ -50,7 +50,7 @@ bool takeUrl(std::string_view& v, std::string& url) {
     return true;
 }
 
-// Опциональный title: только корректно закавыченный; мусор — ошибка разбора.
+// Optional title: only correctly quoted; garbage is a parse error.
 bool takeTitle(std::string_view& v, std::string& title) {
     if (v.empty()) {
         return true;
@@ -87,7 +87,7 @@ bool matchLinkDef(const std::string& line, std::string& label, LinkDef& def) {
 
     std::string url, title;
     if (!takeUrl(s, url) || url.empty() || !takeTitle(s, title)) {
-        return false; // битая <>-форма, пустой адрес или мусор вместо title
+        return false; // broken <>-form, empty destination, or garbage instead of the title
     }
     def = {url, title};
     return true;
@@ -145,7 +145,7 @@ bool parseDestination(const std::string& s, size_t openParen, std::string& url, 
         return false;
     }
     after = close + 1;
-    const std::string inner = s.substr(openParen + 1, close - openParen - 1); // владелец!
+    const std::string inner = s.substr(openParen + 1, close - openParen - 1); // buffer owner (v below refers to it)
     std::string_view v = trim(inner);
     if (!takeUrl(v, url) || !takeTitle(v, title)) {
         return false;

@@ -18,7 +18,7 @@ std::vector<std::vector<InlineElement>> splitByLineBreaks(const std::vector<Inli
     std::vector<std::vector<InlineElement>> groups;
     std::vector<InlineElement> cur;
     auto flush = [&] {
-        // отбрасываем пустые runs перед закрытием группы
+        // drop empty runs before closing the group
         while (!cur.empty() && cur.back().kind == InlineElement::Kind::Run &&
                cur.back().run.text.empty()) {
             cur.pop_back();

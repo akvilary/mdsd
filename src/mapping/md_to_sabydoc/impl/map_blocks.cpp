@@ -1,4 +1,4 @@
-// Диспетчер маппинга, политика разделителей и вход map().
+// Mapping dispatcher, separator policy, and the map() entry point.
 
 #include "mapping/md_to_sabydoc/md_to_sabydoc.hpp"
 
@@ -12,7 +12,7 @@
 namespace mapping {
 namespace detail {
 
-// ---------------------------------------------------------------- диспетчер
+// ---------------------------------------------------------------- dispatcher
 
 void mapSingleBlock(md::BlockPtr& b, std::vector<sd::BlockPtr>& dst, ResourceCollector& rc,
                     bool topLevel, int depth) {
@@ -56,7 +56,7 @@ void mapBlocks(std::vector<md::BlockPtr>& src, std::vector<sd::BlockPtr>& dst,
     }
     for (size_t k = 0; k < src.size(); ++k) {
         mapSingleBlock(src[k], dst, rc, topLevel, depth);
-        // политика разделителей: после спец-блока — пустой абзац, если дальше есть контент
+        // separator policy: after a special block — an empty paragraph if more content follows
         if (!dst.empty() && needsTrailingSeparator(dst.back()->kind) && k + 1 < src.size()) {
             dst.push_back(makeSeparatorMimic());
         }

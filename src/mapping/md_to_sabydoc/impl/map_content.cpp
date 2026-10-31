@@ -1,4 +1,4 @@
-// Маппинг контентных блоков: фабрики, картинки, абзацы, заголовки, цитаты.
+// Mapping of content blocks: factories, images, paragraphs, headers, quotes.
 
 #include "mapping/md_to_sabydoc/md_to_sabydoc.hpp"
 
@@ -27,7 +27,7 @@ std::string alignStr(md::Align a) {
     }
 }
 
-// Спец-блоки, после которых редактор ставит пустой абзац-разделитель
+// Special blocks after which the editor places an empty separator paragraph
 bool needsTrailingSeparator(sd::Block::Kind k) {
     switch (k) {
     case sd::Block::Kind::List:
@@ -67,12 +67,12 @@ std::unique_ptr<sd::Block> makeCaption(const std::string& text) {
     return b;
 }
 
-// ---------------------------------------------------------------- картинки
+// ---------------------------------------------------------------- images
 
 void emitImage(const md::InlineImage& img, std::vector<sd::BlockPtr>& dst, ResourceCollector& rc) {
     unsigned w = 0, h = 0;
     const std::string key = rc.addImage(img.url, w, h);
-    if (key.empty()) { // недоступна (предупреждение уже добавлено) — заметная заглушка
+    if (key.empty()) { // unavailable (a warning has already been added) — a visible placeholder
         dst.push_back(makePlaceholder(img.url));
         return;
     }
@@ -87,7 +87,7 @@ void emitImage(const md::InlineImage& img, std::vector<sd::BlockPtr>& dst, Resou
     }
 }
 
-// ---------------------------------------------------------------- абзацы
+// ---------------------------------------------------------------- paragraphs
 
 void dropTrailingEmptyRuns(std::vector<md::InlineElement>& elems) {
     while (!elems.empty() && elems.back().kind == md::InlineElement::Kind::Run &&
@@ -115,10 +115,10 @@ void mapGroup(const std::vector<md::InlineElement>& group, md::Align align,
             continue;
         }
         if (allowImages) {
-            flushCur(); // картинка — блочный виджет, разрывает абзац
+            flushCur(); // an image is a block widget, it breaks the paragraph
             emitImage(e.image, dst, rc);
         } else {
-            // внутри заголовков/ячеек картинка заменяется alt-текстом
+            // inside headers/cells an image is replaced with its alt text
             const std::string alt = e.image.alt.empty() ? e.image.url : e.image.alt;
             if (!alt.empty()) {
                 cur.push_back(md::InlineElement{md::InlineElement::Kind::Run,
@@ -132,17 +132,17 @@ void mapGroup(const std::vector<md::InlineElement>& group, md::Align align,
 
 void mapParagraph(const md::Block& b, std::vector<sd::BlockPtr>& dst, ResourceCollector& rc,
                   bool allowImages) {
-    for (const auto& group : md::splitByLineBreaks(b.inlines)) { // жёсткие переносы -> новые абзацы
+    for (const auto& group : md::splitByLineBreaks(b.inlines)) { // hard line breaks -> new paragraphs
         mapGroup(group, b.align, dst, rc, allowImages);
     }
 }
 
-// ---------------------------------------------------------------- цитаты и заголовки
+// ---------------------------------------------------------------- quotes and headers
 
 void flattenQuotes(std::vector<md::BlockPtr>& src, std::vector<md::BlockPtr>& out) {
     for (auto& child : src) {
         if (child->type == md::Block::Type::Quote) {
-            flattenQuotes(child->children, out); // вложенность цитат схлопываем
+            flattenQuotes(child->children, out); // quote nesting is collapsed
         } else {
             out.push_back(std::move(child));
         }
@@ -157,7 +157,7 @@ void mapHeader(const md::Block& b, std::vector<sd::BlockPtr>& dst, bool topLevel
         dst.push_back(std::move(h));
         return;
     }
-    // h6 или заголовок внутри цитаты/списка: жирный абзац (уровня 6 в sabydoc нет)
+    // h6 or a header inside a quote/list: a bold paragraph (sabydoc has no level 6)
     auto p = newBlock(sd::Block::Kind::Paragraph);
     p->text = sd::forceBold(sd::buildText(b.inlines));
     dst.push_back(std::move(p));

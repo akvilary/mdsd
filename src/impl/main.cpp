@@ -1,6 +1,6 @@
-// mdsd — конвертер Markdown <-> SabyDoc.
-// Сейчас: convert (md -> sabydoc). Направление sabydoc -> md — в будущем
-// (архитектура к этому готова, см. README).
+// mdsd — a Markdown <-> SabyDoc converter.
+// Currently: convert (md -> sabydoc). The sabydoc -> md direction is future work
+// (the architecture is ready for it, see README).
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
@@ -47,18 +47,18 @@ struct Args {
     bool strict = false;
 };
 
-// Результат разбора аргументов; main трактует его без магических чисел.
+// The result of argument parsing; main interprets it without magic numbers.
 enum class ArgsResult {
-    Ok,         // аргументы разобраны
-    HelpShown,  // --help/--version: справка уже напечатана, выйти с кодом 0
-    UsageError, // неверные аргументы: сообщение уже напечатано, показать справку
+    Ok,         // arguments parsed successfully
+    HelpShown,  // --help/--version: usage already printed, exit with code 0
+    UsageError, // invalid arguments: message already printed, show usage
 };
 
 ArgsResult parseArgs(std::span<char* const> args, Args& out) {
     if (args.size() < 2) {
         return ArgsResult::UsageError;
     }
-    const std::string_view sub = args[1]; // args[0] — имя программы
+    const std::string_view sub = args[1]; // args[0] is the program name
     if (sub == "-h" || sub == "--help") {
         printUsage();
         return ArgsResult::HelpShown;

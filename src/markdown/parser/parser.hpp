@@ -6,10 +6,11 @@
 
 namespace md {
 
-// Полный парсер markdown (CommonMark-подмножество + GFM: таблицы, task-листы,
-// зачёркивание, ссылки/автоссылки, HTML-подмножество).
-// Вход: сырой текст (BOM/CRLF/CR нормализуются; невалидный UTF-8 санитизируется
-// с записью предупреждения). Выход: AST.
+/// \brief Full markdown parser (CommonMark subset + GFM: tables, task lists,
+/// strikethrough, links/autolinks, HTML subset).
+/// \param text Raw input text (BOM/CRLF/CR are normalized; invalid UTF-8 is
+/// sanitized and a warning is recorded).
+/// \return Parsed document AST.
 Document parseMarkdown(const std::string& text);
 
 } // namespace md

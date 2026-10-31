@@ -7,7 +7,7 @@
 namespace md::detail {
 
 std::vector<std::string> splitTableRow(const std::string& line) {
-    // экранированный пайп -> один временный маркер (ровно один!)
+    // escaped pipe -> one temporary marker (exactly one!)
     std::string s;
     s.reserve(line.size());
     for (size_t i = 0; i < line.size(); ++i) {

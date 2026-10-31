@@ -9,17 +9,17 @@ namespace {
 
 Marker finishMarker(const std::string& line, size_t p, size_t mlen, bool ordered) {
     const size_t after = p + mlen;
-    if (after >= line.size()) { // маркер в конце строки — пустой пункт
+    if (after >= line.size()) { // marker at end of line — empty item
         return {true, ordered, p, p + mlen + 1, std::string()};
     }
     const size_t spaces = countRun(line, after, [](char ch) { return ch == ' '; }) - after;
     if (spaces == 0) {
-        return {}; // за маркером не пробел
+        return {}; // no space after the marker
     }
     if (spaces <= 4) {
         return {true, ordered, p, after + spaces, line.substr(after + spaces)};
     }
-    // >4 пробелов: контент с маркер+1, избыточные пробелы сохраняются (код!)
+    // >4 spaces: content starts at marker+1; the extra spaces are preserved (code!)
     const size_t ci = p + mlen + 1;
     return {true, ordered, p, ci, line.substr(ci)};
 }

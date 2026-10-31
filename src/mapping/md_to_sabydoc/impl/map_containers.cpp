@@ -6,7 +6,7 @@
 namespace mapping {
 namespace detail {
 
-// ---------------------------------------------------------------- списки
+// ---------------------------------------------------------------- lists
 
 void mapBlocks(std::vector<md::BlockPtr>& src, std::vector<sd::BlockPtr>& dst,
                ResourceCollector& rc, bool topLevel, int depth);
@@ -47,7 +47,7 @@ void mapList(md::Block& b, std::vector<sd::BlockPtr>& dst, ResourceCollector& rc
     dst.push_back(std::move(lst));
 }
 
-// ---------------------------------------------------------------- таблицы
+// ---------------------------------------------------------------- tables
 
 sd::TableCell mapCell(const std::vector<md::InlineElement>& cell) {
     sd::TableCell c;
@@ -57,7 +57,7 @@ sd::TableCell mapCell(const std::vector<md::InlineElement>& cell) {
         return c;
     }
     for (const auto& g : groups) {
-        c.paragraphs.push_back(sd::buildText(g)); // картинки в ячейках -> alt
+        c.paragraphs.push_back(sd::buildText(g)); // images inside cells -> alt
     }
     return c;
 }
