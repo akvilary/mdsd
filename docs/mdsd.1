@@ -1,0 +1,25 @@
+.\" mdsd — Markdown <-> SabyDoc converter
+.TH MDSD 1 "2026" "mdsd 1.0.0" "User Commands"
+.SH NAME
+mdsd \- Markdown to SabyDoc format converter
+.SH SYNOPSIS
+.B mdsd convert
+.I INPUT.md
+.RB [ \-o
+.IR OUTPUT.sabydoc ]
+.RB [ \-\-title\ TEXT ]
+.RB [ \-\-page\-name\ NAME ]
+.RB [ \-\-strict ]
+.SH DESCRIPTION
+Converts Markdown (CommonMark subset + GFM: tables, task lists, strikethrough,
+links, HTML subset) to SabyDoc document format. The output `.sabydoc` file is
+a ZIP archive without compression containing widget markup. Document title is
+taken from front matter (\fBtitle:\fP), then from \fB\-\-title\fP, then from
+the filename stem.
+.SH EXIT CODES
+0 — success; 1 — I/O error; 2 — invalid arguments;
+3 — warnings present with \fB\-\-strict\fP.
+.SH FILES
+Project and documentation: README.md in the project directory.
+.SH SEE ALSO
+Full description of supported constructs and limitations in README.md.

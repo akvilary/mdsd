@@ -1,0 +1,4 @@
+build/
+/mdsd
+*.o
+examples/*.sabydoc
