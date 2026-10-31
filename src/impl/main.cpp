@@ -1,6 +1,6 @@
-// mdsd — a Markdown <-> SabyDoc converter.
-// Currently: convert (md -> sabydoc). The sabydoc -> md direction is future work
-// (the architecture is ready for it, see README).
+// mdsd — Markdown <-> SabyDoc converter.
+// Currently: md -> sabydoc (forward). Reverse (sabydoc -> md) is planned;
+// the -r/--reverse flag is reserved for it.
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
@@ -10,8 +10,8 @@
 
 #include "mapping/md_to_sabydoc/md_to_sabydoc.hpp"
 #include "markdown/parser/parser.hpp"
-#include "sabydoc/model/widget_writer/document_writer/document_writer.hpp"
 #include "sabydoc/model/resource_collector/resource_collector.hpp"
+#include "sabydoc/model/widget_writer/document_writer/document_writer.hpp"
 
 namespace {
 
@@ -22,14 +22,16 @@ void printUsage() {
         "mdsd %s — Markdown <-> SabyDoc converter\n"
         "\n"
         "Usage:\n"
-        "  mdsd convert INPUT.md [-o OUTPUT.sabydoc] [options]\n"
+        "  mdsd INPUT.md [-o OUTPUT.sabydoc] [options]\n"
+        "  mdsd INPUT.sabydoc -r [-o OUTPUT.md]     (not yet implemented)\n"
         "\n"
         "Options:\n"
-        "  -o, --output FILE   output .sabydoc (default: same as INPUT, with .sabydoc extension)\n"
+        "  -o, --output FILE   output file (default: same as INPUT, with swapped extension)\n"
         "      --title TEXT    document title (documentHeader); default: title from\n"
         "                      front matter, then --title, then filename stem\n"
         "      --page-name NAME page name (default \"Basic\")\n"
         "      --strict        treat warnings as errors (exit code 3)\n"
+        "  -r, --reverse       reverse conversion: sabydoc -> md (reserved, not yet implemented)\n"
         "  -h, --help          this help\n"
         "      --version       version\n"
         "\n"
@@ -38,6 +40,7 @@ void printUsage() {
         kVersion);
 }
 
+/// \brief Parsed command-line arguments.
 struct Args {
     std::string input;
     std::string output;
@@ -45,33 +48,22 @@ struct Args {
     bool hasTitle = false;
     std::string pageName = "Basic";
     bool strict = false;
+    bool reverse = false; ///< Reserved for sabydoc -> md conversion
 };
 
-// The result of argument parsing; main interprets it without magic numbers.
+/// \brief Result of argument parsing; main interprets it without magic numbers.
 enum class ArgsResult {
-    Ok,         // arguments parsed successfully
-    HelpShown,  // --help/--version: usage already printed, exit with code 0
-    UsageError, // invalid arguments: message already printed, show usage
+    Ok,         ///< Arguments parsed successfully
+    HelpShown,  ///< --help/--version: usage already printed, exit with code 0
+    UsageError, ///< Invalid arguments: message already printed, show usage
 };
 
 ArgsResult parseArgs(std::span<char* const> args, Args& out) {
     if (args.size() < 2) {
         return ArgsResult::UsageError;
     }
-    const std::string_view sub = args[1]; // args[0] is the program name
-    if (sub == "-h" || sub == "--help") {
-        printUsage();
-        return ArgsResult::HelpShown;
-    }
-    if (sub == "--version") {
-        std::printf("mdsd %s\n", kVersion);
-        return ArgsResult::HelpShown;
-    }
-    if (sub != "convert") {
-        return ArgsResult::UsageError;
-    }
     bool haveInput = false;
-    for (size_t i = 2; i < args.size(); ++i) {
+    for (size_t i = 1; i < args.size(); ++i) { // args[0] is the program name
         const std::string a = args[i];
         auto needValue = [&](const char* name) -> const char* {
             if (i + 1 >= args.size()) {
@@ -90,8 +82,13 @@ ArgsResult parseArgs(std::span<char* const> args, Args& out) {
             out.pageName = needValue(a.c_str());
         } else if (a == "--strict") {
             out.strict = true;
+        } else if (a == "-r" || a == "--reverse") {
+            out.reverse = true;
         } else if (a == "-h" || a == "--help") {
             printUsage();
+            return ArgsResult::HelpShown;
+        } else if (a == "--version") {
+            std::printf("mdsd %s\n", kVersion);
             return ArgsResult::HelpShown;
         } else if (!a.empty() && a[0] == '-') {
             std::fprintf(stderr, "Error: unknown option %s\n", a.c_str());
@@ -111,6 +108,7 @@ ArgsResult parseArgs(std::span<char* const> args, Args& out) {
     return ArgsResult::Ok;
 }
 
+/// \brief Reads a file into a string. Sets ok=false on failure.
 std::string readFile(const std::filesystem::path& p, bool& ok) {
     std::ifstream f(p, std::ios::binary);
     if (!f) {
@@ -121,6 +119,7 @@ std::string readFile(const std::filesystem::path& p, bool& ok) {
     return std::string(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>());
 }
 
+/// \brief Writes bytes to a file. Returns false on failure.
 bool writeFile(const std::filesystem::path& p, const std::string& bytes) {
     std::ofstream f(p, std::ios::binary | std::ios::trunc);
     if (!f) {
@@ -128,6 +127,12 @@ bool writeFile(const std::filesystem::path& p, const std::string& bytes) {
     }
     f.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
     return static_cast<bool>(f);
+}
+
+/// \brief Computes the default output path from the input path and direction.
+std::filesystem::path defaultOutput(const std::filesystem::path& input, bool reverse) {
+    const auto ext = reverse ? ".md" : ".sabydoc";
+    return input.parent_path() / (input.stem().string() + ext);
 }
 
 } // namespace
@@ -144,6 +149,11 @@ int main(int argc, char** argv) {
         break;
     }
 
+    if (args.reverse) {
+        std::fprintf(stderr, "Error: reverse conversion (sabydoc -> md) is not yet implemented\n");
+        return 1;
+    }
+
     namespace fs = std::filesystem;
     const fs::path input(args.input);
     std::error_code ec;
@@ -153,7 +163,7 @@ int main(int argc, char** argv) {
     }
     fs::path output(args.output);
     if (output.empty()) {
-        output = input.parent_path() / (input.stem().string() + ".sabydoc");
+        output = defaultOutput(input, args.reverse);
     }
     if (fs::weakly_canonical(input, ec) == fs::weakly_canonical(output, ec)) {
         std::fprintf(stderr, "Error: output file is the same as input\n");

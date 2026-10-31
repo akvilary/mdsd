@@ -34,7 +34,7 @@ g++, then clang++-15+). Override with `CXX` environment variable.
 ## Usage
 
 ```bash
-mdsd convert INPUT.md [-o OUTPUT.sabydoc] [--title TEXT] [--page-name NAME] [--strict]
+mdsd INPUT.md [-o OUTPUT.sabydoc] [--title TEXT] [--page-name NAME] [--strict]
 ```
 
 - Default output: same as input, with `.sabydoc` extension;

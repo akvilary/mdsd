@@ -118,7 +118,7 @@ add_test(NAME unit COMMAND mdsd_tests)
 # Интеграционный прогон: конвертация примера + структурный валидатор (проверяет и эталон)
 add_test(NAME integration
          COMMAND bash -c
-           "$<TARGET_FILE:mdsd> convert ${CMAKE_CURRENT_SOURCE_DIR}/examples/test.md -o ${CMAKE_CURRENT_BINARY_DIR}/e2e.sabydoc && python3 ${CMAKE_CURRENT_SOURCE_DIR}/scripts/validate.py ${CMAKE_CURRENT_BINARY_DIR}/e2e.sabydoc ${CMAKE_CURRENT_SOURCE_DIR}/TestDocument.sabydoc")
+           "$<TARGET_FILE:mdsd> ${CMAKE_CURRENT_SOURCE_DIR}/examples/test.md -o ${CMAKE_CURRENT_BINARY_DIR}/e2e.sabydoc && python3 ${CMAKE_CURRENT_SOURCE_DIR}/scripts/validate.py ${CMAKE_CURRENT_BINARY_DIR}/e2e.sabydoc ${CMAKE_CURRENT_SOURCE_DIR}/TestDocument.sabydoc")
 
 include(GNUInstallDirs)
 install(TARGETS mdsd RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

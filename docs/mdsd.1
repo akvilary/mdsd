@@ -3,7 +3,7 @@
 .SH NAME
 mdsd \- Markdown to SabyDoc format converter
 .SH SYNOPSIS
-.B mdsd convert
+.B mdsd
 .I INPUT.md
 .RB [ \-o
 .IR OUTPUT.sabydoc ]
@@ -16,10 +16,24 @@ links, HTML subset) to SabyDoc document format. The output `.sabydoc` file is
 a ZIP archive without compression containing widget markup. Document title is
 taken from front matter (\fBtitle:\fP), then from \fB\-\-title\fP, then from
 the filename stem.
+.SH OPTIONS
+.TP
+.BI \-o " FILE" "\fR, "\fB \-\-output " FILE
+Output file path (default: same as INPUT with .sabydoc extension).
+.TP
+.BI \-\-title " TEXT"
+Document title (documentHeader).
+.TP
+.BI \-\-page\-name " NAME"
+Page name (default: "Basic").
+.TP
+.B \-\-strict
+Treat warnings as errors (exit code 3).
+.TP
+.BR "\-r\fR, "\fB \-\-reverse
+Reserved for reverse conversion (sabydoc -> md). Not yet implemented.
 .SH EXIT CODES
 0 — success; 1 — I/O error; 2 — invalid arguments;
 3 — warnings present with \fB\-\-strict\fP.
-.SH FILES
-Project and documentation: README.md in the project directory.
 .SH SEE ALSO
 Full description of supported constructs and limitations in README.md.
