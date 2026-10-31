@@ -33,7 +33,10 @@ bool BlockParser::interruptsParagraph(const std::string& line, size_t idx) const
 
 BlockPtr BlockParser::parseParagraph() {
     std::vector<std::pair<std::string, bool>> collected;
-    addParagraphLine(collected, mLines[mCursor].substr(indentOf(mLines[mCursor])));
+    addParagraphLine(
+        collected,
+        mLines[mCursor].substr(indentOf(mLines[mCursor]))
+    );
     ++mCursor;
     while (mCursor < mLines.size()) {
         const std::string& line = mLines[mCursor];
@@ -46,7 +49,10 @@ BlockPtr BlockParser::parseParagraph() {
         if (interruptsParagraph(line, mCursor)) {
             break;
         }
-        addParagraphLine(collected, line.substr(indentOf(line)));
+        addParagraphLine(
+            collected,
+            line.substr(indentOf(line))
+        );
         ++mCursor;
     }
     auto b = std::make_unique<Block>();
@@ -113,7 +119,10 @@ void BlockParser::addParagraphLine(std::vector<std::pair<std::string, bool>>& co
             l.pop_back();
         }
     }
-    collected.emplace_back(l, hard);
+    collected.emplace_back(
+        l,
+        hard
+    );
 }
 
 size_t BlockParser::trailingBackslashes(const std::string& l) {

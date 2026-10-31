@@ -7,7 +7,11 @@
 // behavior are ours — this is the SabyDoc format contract and the point of truth.
 namespace utf8 {
 
-char32_t decode(const std::string& s, size_t& i, bool* ok) {
+char32_t decode(
+    const std::string& s,
+    size_t& i,
+    bool* ok
+){
     if (ok) {
         *ok = true;
     }
@@ -51,9 +55,17 @@ size_t sanitize(std::string& s) {
     while (i < s.size()) {
         const size_t start = i;
         bool ok = false;
-        decode(s, i, &ok);
+        decode(
+            s,
+            i,
+            &ok
+        );
         if (ok) {
-            out.append(s, start, i - start);
+            out.append(
+                s,
+                start,
+                i - start
+            );
         } else {
             out += "\xEF\xBF\xBD"; // U+FFFD
             ++replaced;

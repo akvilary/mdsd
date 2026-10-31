@@ -17,7 +17,10 @@ Json makeColumnsConfigs(size_t n) {
     return configs;
 }
 
-Json writeCellParagraph(const Text& t, const std::string& align) {
+Json writeCellParagraph(
+    const Text& t,
+    const std::string& align
+){
     Block p;
     p.kind = Block::Kind::Paragraph;
     p.id = makeUuid4();
@@ -26,7 +29,10 @@ Json writeCellParagraph(const Text& t, const std::string& align) {
     return writeParagraph(p);
 }
 
-Json writeTableCell(const TableCell& cell, const std::string& align) {
+Json writeTableCell(
+    const TableCell& cell,
+    const std::string& align
+){
     Json attrs = Json::object();
     attrs["id"] = makeUuid4();
     Json cellNode = Json::array({"ModuleEditor/table:Cell", std::move(attrs)});
@@ -40,13 +46,19 @@ Json writeTableCell(const TableCell& cell, const std::string& align) {
     return cellNode;
 }
 
-Json writeTableRow(const std::vector<TableCell>& row, std::span<const std::string> colAlign) {
+Json writeTableRow(
+    const std::vector<TableCell>& row,
+    std::span<const std::string> colAlign
+){
     Json attrs = Json::object();
     attrs["id"] = makeUuid4();
     Json rowNode = Json::array({"ModuleEditor/table:Row", std::move(attrs)});
     for (size_t col = 0; col < row.size(); ++col) {
         rowNode.push_back(
-            writeTableCell(row[col], col < colAlign.size() ? colAlign[col] : std::string()));
+            writeTableCell(
+                row[col],
+                col < colAlign.size() ? colAlign[col] : std::string())
+            );
     }
     return rowNode;
 }

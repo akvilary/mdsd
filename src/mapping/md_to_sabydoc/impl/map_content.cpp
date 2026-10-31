@@ -69,7 +69,11 @@ std::unique_ptr<sd::Block> makeCaption(const std::string& text) {
 
 // ---------------------------------------------------------------- images
 
-void emitImage(const md::InlineImage& img, std::vector<sd::BlockPtr>& dst, ResourceCollector& rc) {
+void emitImage(
+    const md::InlineImage& img,
+    std::vector<sd::BlockPtr>& dst,
+    ResourceCollector& rc
+){
     unsigned w = 0, h = 0;
     const std::string key = rc.addImage(img.url, w, h);
     if (key.empty()) { // unavailable (a warning has already been added) — a visible placeholder
@@ -96,8 +100,11 @@ void dropTrailingEmptyRuns(std::vector<md::InlineElement>& elems) {
     }
 }
 
-void mapGroup(const std::vector<md::InlineElement>& group, md::Align align,
-              std::vector<sd::BlockPtr>& dst, ResourceCollector& rc, bool allowImages) {
+void mapGroup(const std::vector<md::InlineElement>& group,
+              md::Align align,
+              std::vector<sd::BlockPtr>& dst,
+              ResourceCollector& rc,
+              bool allowImages) {
     std::vector<md::InlineElement> cur;
     auto flushCur = [&] {
         dropTrailingEmptyRuns(cur);
@@ -116,7 +123,11 @@ void mapGroup(const std::vector<md::InlineElement>& group, md::Align align,
         }
         if (allowImages) {
             flushCur(); // an image is a block widget, it breaks the paragraph
-            emitImage(e.image, dst, rc);
+            emitImage(
+                e.image,
+                dst,
+                rc
+            );
         } else {
             // inside headers/cells an image is replaced with its alt text
             const std::string alt = e.image.alt.empty() ? e.image.url : e.image.alt;
@@ -130,16 +141,28 @@ void mapGroup(const std::vector<md::InlineElement>& group, md::Align align,
     flushCur();
 }
 
-void mapParagraph(const md::Block& b, std::vector<sd::BlockPtr>& dst, ResourceCollector& rc,
+void mapParagraph(const md::Block& b,
+                  std::vector<sd::BlockPtr>& dst,
+                  ResourceCollector& rc,
                   bool allowImages) {
-    for (const auto& group : md::splitByLineBreaks(b.inlines)) { // hard line breaks -> new paragraphs
-        mapGroup(group, b.align, dst, rc, allowImages);
+    for (const auto& group :
+         md::splitByLineBreaks(b.inlines)) { // hard line breaks -> new paragraphs
+        mapGroup(
+            group,
+            b.align,
+            dst,
+            rc,
+            allowImages
+        );
     }
 }
 
 // ---------------------------------------------------------------- quotes and headers
 
-void flattenQuotes(std::vector<md::BlockPtr>& src, std::vector<md::BlockPtr>& out) {
+void flattenQuotes(
+    std::vector<md::BlockPtr>& src,
+    std::vector<md::BlockPtr>& out
+){
     for (auto& child : src) {
         if (child->type == md::Block::Type::Quote) {
             flattenQuotes(child->children, out); // quote nesting is collapsed
@@ -149,7 +172,11 @@ void flattenQuotes(std::vector<md::BlockPtr>& src, std::vector<md::BlockPtr>& ou
     }
 }
 
-void mapHeader(const md::Block& b, std::vector<sd::BlockPtr>& dst, bool topLevel) {
+void mapHeader(
+    const md::Block& b,
+    std::vector<sd::BlockPtr>& dst,
+    bool topLevel
+){
     if (topLevel && b.level >= 1 && b.level <= 5) {
         auto h = newBlock(sd::Block::Kind::Header);
         h->level = b.level;

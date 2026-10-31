@@ -21,7 +21,11 @@ std::vector<InlineElement> InlineParser::parse(const std::string& s) {
     return mergeRuns(parseRec(ctx));
 }
 
-size_t InlineParser::tryEscape(const Ctx& c, size_t i, std::string& buf) {
+size_t InlineParser::tryEscape(
+    const Ctx& c,
+    size_t i,
+    std::string& buf
+){
     if (i + 1 < c.s.size() && isPunct(c.s[i + 1])) {
         buf += c.s[i + 1];
         return 2; // backslash + escaped character
@@ -29,19 +33,28 @@ size_t InlineParser::tryEscape(const Ctx& c, size_t i, std::string& buf) {
     return 0;
 }
 
-size_t InlineParser::tryCodeSpan(const Ctx& c, size_t i, std::vector<InlineElement>& out,
+size_t InlineParser::tryCodeSpan(const Ctx& c,
+                                 size_t i,
+                                 std::vector<InlineElement>& out,
                                  std::string& buf) const {
     const size_t n = countRun(c.s, i, [](char ch) { return ch == '`'; }) - i;
     const size_t close = findCodeSpanClose(c.s, i + n, n);
     if (close == std::string::npos) { // no matching fence of the same length — literal
-        buf.append(n, '`');
+        buf.append(
+            n,
+            '`'
+        );
         return n;
     }
     std::string content = c.s.substr(i + n, close - (i + n));
     if (needsSpaceTrim(content)) { // trim one space at both edges (CommonMark)
         content = content.substr(1, content.size() - 2);
     }
-    emitRun(c, out, buf);
+    emitRun(
+        c,
+        out,
+        buf
+    );
     StyleFlags cs = c.st;
     cs.code = true;
     out.push_back(
@@ -49,7 +62,11 @@ size_t InlineParser::tryCodeSpan(const Ctx& c, size_t i, std::vector<InlineEleme
     return close + n - i;
 }
 
-size_t InlineParser::findCodeSpanClose(const std::string& s, size_t from, size_t n) {
+size_t InlineParser::findCodeSpanClose(
+    const std::string& s,
+    size_t from,
+    size_t n
+){
     size_t j = from;
     while (j < s.size()) {
         if (s[j] == '`') {
@@ -87,7 +104,8 @@ std::vector<InlineElement> InlineParser::parseRec(const Ctx& c) const {
     if (c.depth > kMaxNestingDepth) {
         warn("inline nesting too deep — text left as-is");
         if (!c.s.empty()) {
-            out.push_back(InlineElement{InlineElement::Kind::Run, InlineRun{c.s, c.st, c.link},
+            out.push_back(InlineElement{InlineElement::Kind::Run,
+                                        InlineRun{c.s, c.st, c.link},
                                         InlineImage{}});
         }
         return out;
@@ -121,7 +139,11 @@ std::vector<InlineElement> InlineParser::parseRec(const Ctx& c) const {
         buf += ch;
         ++i;
     }
-    emitRun(c, out, buf);
+    emitRun(
+        c,
+        out,
+        buf
+    );
     return out;
 }
 

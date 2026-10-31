@@ -19,17 +19,24 @@ by round-trip) and `algo.hpp` (30 lines over `std::ranges`).
 
 ## Build
 
-```bash
-bash install.sh            # build + install (root: /usr/local; otherwise ~/.local)
-bash install.sh build      # build only; binary appears at project root: ./mdsd
-bash install.sh test       # build + run unit tests (ctest)
-bash install.sh uninstall  # remove installed files
-bash install.sh clean      # remove build/
+Cross-platform (Linux, macOS, Windows). Requires: Python 3.8+, CMake 3.16+, C++20 compiler.
+
+```python
+python3 install.py            # build + install (default)
+python3 install.py build      # build only; binary appears at project root: ./mdsd
+python3 install.py test       # build + run unit tests (ctest)
+python3 install.py uninstall  # remove installed files
+python3 install.py clean      # remove build/
 ```
 
-`install.sh` works from any directory — artifacts always land in the project
-directory. The script auto-detects the best available compiler (prefers newer
-g++, then clang++-15+). Override with `CXX` environment variable.
+Install locations:
+| Platform | User install | System install |
+|---|---|---|
+| Linux | `~/.local/bin/` | `/usr/local/bin/` (run as root) |
+| macOS | `~/.local/bin/` | `/usr/local/bin/` (run as root) |
+| Windows | `%LOCALAPPDATA%\Programs\` | `C:\Program Files\` (run as admin) |
+
+Override with `PREFIX=...` environment variable. Compiler override with `CXX=...`.
 
 ## Usage
 
@@ -173,7 +180,7 @@ Fixture pairs for both directions accumulate in tests.
     (+`block_parser/`), `markdown/parser/chars/` (Cyrillic suite), `e2e/`;
   - `harness/md_dump.hpp` — shared helpers (inline dump, `checkInline`);
   - single-module run: `./build/mdsd_tests --gtest_filter=BlockParser.*`;
-- `bash install.sh test` — two tests via ctest: **unit** (above) and
+- `python3 install.py test` — two tests via ctest: **unit** (above) and
   **integration** (convert `examples/test.md` + `scripts/validate.py`
   on result and reference `TestDocument.sabydoc`);
 - format reverse-engineering is captured in `scripts/validate.py`.

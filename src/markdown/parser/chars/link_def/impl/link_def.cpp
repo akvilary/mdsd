@@ -29,7 +29,10 @@ namespace {
 
 // Start of a destination: <...> (spaces allowed inside) or "up to the first space".
 // Advances v past the destination; returns false for a malformed angle form.
-bool takeUrl(std::string_view& v, std::string& url) {
+bool takeUrl(
+    std::string_view& v,
+    std::string& url
+){
     if (!v.empty() && v.front() == '<') {
         const size_t gt = v.find('>', 1);
         if (gt == std::string_view::npos) {
@@ -51,7 +54,10 @@ bool takeUrl(std::string_view& v, std::string& url) {
 }
 
 // Optional title: only correctly quoted; garbage is a parse error.
-bool takeTitle(std::string_view& v, std::string& title) {
+bool takeTitle(
+    std::string_view& v,
+    std::string& title
+){
     if (v.empty()) {
         return true;
     }
@@ -66,7 +72,11 @@ bool takeTitle(std::string_view& v, std::string& title) {
 
 } // namespace
 
-bool matchLinkDef(const std::string& line, std::string& label, LinkDef& def) {
+bool matchLinkDef(
+    const std::string& line,
+    std::string& label,
+    LinkDef& def
+){
     std::string_view s = trim(line);
     if (!s.starts_with("[")) {
         return false;
@@ -93,7 +103,10 @@ bool matchLinkDef(const std::string& line, std::string& label, LinkDef& def) {
     return true;
 }
 
-size_t matchBracket(const std::string& s, size_t open) {
+size_t matchBracket(
+    const std::string& s,
+    size_t open
+){
     int depth = 0;
     for (size_t i = open; i < s.size(); ++i) {
         if (s[i] == '\\') {
@@ -111,7 +124,10 @@ size_t matchBracket(const std::string& s, size_t open) {
 
 namespace {
 
-size_t findCloseParen(const std::string& s, size_t openParen) {
+size_t findCloseParen(
+    const std::string& s,
+    size_t openParen
+){
     int depth = 0;
     bool inQ = false;
     char qc = 0;
@@ -135,7 +151,10 @@ size_t findCloseParen(const std::string& s, size_t openParen) {
 
 } // namespace
 
-bool parseDestination(const std::string& s, size_t openParen, std::string& url, std::string& title,
+bool parseDestination(const std::string& s,
+                      size_t openParen,
+                      std::string& url,
+                      std::string& title,
                       size_t& after) {
     if (openParen >= s.size() || s[openParen] != '(') {
         return false;
@@ -145,7 +164,11 @@ bool parseDestination(const std::string& s, size_t openParen, std::string& url, 
         return false;
     }
     after = close + 1;
-    const std::string inner = s.substr(openParen + 1, close - openParen - 1); // buffer owner (v below refers to it)
+    const std::string inner =
+        s.substr(
+            openParen + 1,
+            close - openParen - 1
+        );
     std::string_view v = trim(inner);
     if (!takeUrl(v, url) || !takeTitle(v, title)) {
         return false;

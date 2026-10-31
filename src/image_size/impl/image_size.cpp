@@ -20,7 +20,10 @@ uint32_t rdLE24(const unsigned char* p) {
            (static_cast<uint32_t>(p[2]) << 16);
 }
 
-ImageSize probePng(const unsigned char* p, size_t n) {
+ImageSize probePng(
+    const unsigned char* p,
+    size_t n
+){
     static const unsigned char sig[] = {0x89, 'P', 'N', 'G', '\r', '\n', 0x1A, '\n'};
     if (n < 33 || std::memcmp(p, sig, 8) != 0 || std::memcmp(p + 12, "IHDR", 4) != 0) {
         return {};
@@ -32,7 +35,10 @@ ImageSize probePng(const unsigned char* p, size_t n) {
     return s;
 }
 
-ImageSize probeGif(const unsigned char* p, size_t n) {
+ImageSize probeGif(
+    const unsigned char* p,
+    size_t n
+){
     if (n < 10 || std::memcmp(p, "GIF8", 4) != 0) {
         return {};
     }
@@ -43,13 +49,24 @@ ImageSize probeGif(const unsigned char* p, size_t n) {
     return s;
 }
 
-ImageSize probeBmp(const unsigned char* p, size_t n) {
+ImageSize probeBmp(
+    const unsigned char* p,
+    size_t n
+){
     if (n < 26 || p[0] != 'B' || p[1] != 'M') {
         return {};
     }
     int32_t w, h;
-    std::memcpy(&w, p + 18, 4);
-    std::memcpy(&h, p + 22, 4);
+    std::memcpy(
+        &w,
+        p + 18,
+        4
+    );
+    std::memcpy(
+        &h,
+        p + 22,
+        4
+    );
     ImageSize s;
     s.width = static_cast<unsigned>(w < 0 ? -w : w);
     s.height = static_cast<unsigned>(h < 0 ? -h : h);
@@ -57,7 +74,10 @@ ImageSize probeBmp(const unsigned char* p, size_t n) {
     return s;
 }
 
-ImageSize probeJpeg(const unsigned char* p, size_t n) {
+ImageSize probeJpeg(
+    const unsigned char* p,
+    size_t n
+){
     if (n < 4 || p[0] != 0xFF || p[1] != 0xD8) {
         return {};
     }
@@ -96,14 +116,21 @@ ImageSize probeJpeg(const unsigned char* p, size_t n) {
     return {};
 }
 
-ImageSize probeWebp(const unsigned char* p, size_t n) {
+ImageSize probeWebp(
+    const unsigned char* p,
+    size_t n
+){
     if (n < 30 || std::memcmp(p, "RIFF", 4) != 0 || std::memcmp(p + 8, "WEBP", 4) != 0) {
         return {};
     }
     size_t i = 12;
     while (i + 8 <= n) {
         char fourcc[4];
-        std::memcpy(fourcc, p + i, 4);
+        std::memcpy(
+            fourcc,
+            p + i,
+            4
+        );
         const uint32_t size = rdLE32(p + i + 4);
         const unsigned char* payload = p + i + 8;
         const size_t avail = n - (i + 8);

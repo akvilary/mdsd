@@ -13,24 +13,24 @@ namespace sd::io {
 
 using sd::Json;
 
-/// \brief Serializes a block by dispatching on its Kind.
-/// \param b The block to serialize.
-/// \return The JSONML node representing the block value.
+/// Serializes a block by dispatching on its Kind.
+/// Param b: The block to serialize.
+/// Returns The JSONML node representing the block value.
 Json writeBlockValue(const Block& b);
 
-/// \brief Serializes a rich text with its formatting ranges.
-/// \param t The text to serialize.
-/// \return The JSONML node for the formatted text.
+/// Serializes a rich text with its formatting ranges.
+/// Param t: The text to serialize.
+/// Returns The JSONML node for the formatted text.
 Json writeFormattedText(const Text& t);
 
-/// \brief Serializes a paragraph block (including header variants).
-/// \param b The paragraph-like block.
-/// \return The JSONML node for the paragraph.
+/// Serializes a paragraph block (including header variants).
+/// Param b: The paragraph-like block.
+/// Returns The JSONML node for the paragraph.
 Json writeParagraph(const Block& b);
 
-/// \brief Serializes a table block with its rows and column alignments.
-/// \param b The table block.
-/// \return The JSONML node for the table.
+/// Serializes a table block with its rows and column alignments.
+/// Param b: The table block.
+/// Returns The JSONML node for the table.
 Json writeTable(const Block& b);
 
 } // namespace sd::io

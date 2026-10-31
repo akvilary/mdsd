@@ -6,11 +6,11 @@
 
 namespace md {
 
-/// \brief Full markdown parser (CommonMark subset + GFM: tables, task lists,
+/// Full markdown parser (CommonMark subset + GFM: tables, task lists,
 /// strikethrough, links/autolinks, HTML subset).
-/// \param text Raw input text (BOM/CRLF/CR are normalized; invalid UTF-8 is
+/// Param text: Raw input text (BOM/CRLF/CR are normalized; invalid UTF-8 is
 /// sanitized and a warning is recorded).
-/// \return Parsed document AST.
+/// Returns Parsed document AST.
 Document parseMarkdown(const std::string& text);
 
 } // namespace md

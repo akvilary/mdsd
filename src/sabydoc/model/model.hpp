@@ -6,16 +6,16 @@
 
 #include "markdown/ast/ast.hpp"
 
-/// \brief Canonical SabyDoc model. The single domain for BOTH directions:
+/// Canonical SabyDoc model. The single domain for BOTH directions:
 /// md -> sabydoc (mapping builds the model, widget_writer serializes it to JSONML)
 /// and in the future sabydoc -> md (widget_reader will build the model from JSONML).
 /// No JSONML details should ever live here.
 namespace sd {
 
-/// \brief Marker style of a list block.
+/// Marker style of a list block.
 enum class ListMarker { Bullet, Numbered, Checkbox };
 
-/// \brief Formatting range: [offset, length] in UTF-16 CODE UNITS
+/// Formatting range: [offset, length] in UTF-16 CODE UNITS
 /// (like String.length in the JS editor). href != "" means a link.
 struct FormatRange {
     size_t offset = 0;
@@ -27,18 +27,18 @@ struct FormatRange {
     std::string href;
 };
 
-/// \brief Rich text: UTF-8 content plus a list of formatting ranges.
+/// Rich text: UTF-8 content plus a list of formatting ranges.
 struct Text {
     std::string content; // UTF-8; empty string → the children:"" attribute
     std::vector<FormatRange> formats;
     bool emptyColor1 = false; // imitates the editor's separator empty paragraph
 };
 
-/// \brief A node of the document block tree.
+/// A node of the document block tree.
 struct Block;
 using BlockPtr = std::unique_ptr<Block>;
 
-/// \brief A single list item: checkbox state, content, and nested child blocks.
+/// A single list item: checkbox state, content, and nested child blocks.
 struct ListItem {
     std::string id;
     bool checked = false;
@@ -46,14 +46,14 @@ struct ListItem {
     std::vector<BlockPtr> children; // nested list, extra paragraphs of the item
 };
 
-/// \brief One table cell holding its paragraphs.
+/// One table cell holding its paragraphs.
 struct TableCell {
     std::vector<Text> paragraphs; // hard line breaks inside a cell → multiple paragraphs
 };
 
-/// \brief A block-level element of the document (paragraph, header, list, table, ...).
+/// A block-level element of the document (paragraph, header, list, table, ...).
 struct Block {
-    /// \brief The concrete block kind.
+    /// The concrete block kind.
     enum class Kind {
         DocumentHeader,
         Header,
@@ -88,7 +88,7 @@ struct Block {
     unsigned imageW = 0, imageH = 0;
 };
 
-/// \brief An embedded binary resource (image) of the document.
+/// An embedded binary resource (image) of the document.
 struct Resource {
     std::string key;      // r1, r2, ...
     std::string fileName; // original file name (for the fileName attribute)
@@ -98,7 +98,7 @@ struct Resource {
     std::string bytes; // file contents
 };
 
-/// \brief The whole SabyDoc document: title, blocks, and resources.
+/// The whole SabyDoc document: title, blocks, and resources.
 struct Document {
     std::string title; // documentHeader
     std::string pageName = "Basic";

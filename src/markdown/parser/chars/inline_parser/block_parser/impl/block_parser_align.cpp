@@ -20,7 +20,10 @@ BlockPtr BlockParser::tryAlignWrapper(int depth) {
 }
 
 // Single-line variant: <div align=...>text</div>
-BlockPtr BlockParser::trySingleLineAlign(const std::string& tag, Align align) {
+BlockPtr BlockParser::trySingleLineAlign(
+    const std::string& tag,
+    Align align
+){
     const std::string& line = mLines[mCursor];
     const size_t openEnd = line.find('>', indentOf(line));
     if (openEnd == std::string::npos) {
@@ -43,7 +46,10 @@ BlockPtr BlockParser::trySingleLineAlign(const std::string& tag, Align align) {
     return b;
 }
 
-BlockPtr BlockParser::tryBlockAlign(const AlignWrap& wrap, int depth) {
+BlockPtr BlockParser::tryBlockAlign(
+    const AlignWrap& wrap,
+    int depth
+){
     ++mCursor;
     std::vector<std::string> inner;
     const std::string closeTag = "</" + wrap.tag;
@@ -59,7 +65,10 @@ BlockPtr BlockParser::tryBlockAlign(const AlignWrap& wrap, int depth) {
         ++mCursor;
     }
     std::vector<BlockPtr> kids = parseInner(inner, depth + 1);
-    applyAlign(kids, wrap.align);
+    applyAlign(
+        kids,
+        wrap.align
+    );
     if (kids.empty()) {
         return nullptr;
     }
@@ -82,8 +91,12 @@ std::optional<BlockParser::AlignWrap> BlockParser::alignWrapper(const std::strin
     return std::nullopt;
 }
 
-std::optional<BlockParser::AlignWrap> BlockParser::tryAlignTag(const std::string& line, size_t p,
-                                                               const char* tag) {
+std::optional<BlockParser::AlignWrap>
+BlockParser::tryAlignTag(
+    const std::string& line,
+    size_t p,
+    const char* tag
+){
     const std::string open = std::string("<") + tag;
     if (!std::string_view(line).substr(p).starts_with(open)) {
         return std::nullopt;
@@ -97,15 +110,22 @@ std::optional<BlockParser::AlignWrap> BlockParser::tryAlignTag(const std::string
         return std::nullopt;
     }
     const Align align =
-        alignFromAttrs(line.substr(after, gt - after), std::string_view(tag) == "center");
+        alignFromAttrs(
+            line.substr(after, gt - after),
+            std::string_view(tag) == "center"
+        );
     if (align == Align::None && std::string_view(tag) != "center") {
         return std::nullopt;
     }
     return AlignWrap{tag, align};
 }
 
-// The align= value; the attribute scanner is shared (html_tag::attrValue, guards against "data-align").
-Align BlockParser::alignFromAttrs(const std::string& attrs, bool centerTag) {
+// The align= value; the attribute scanner is shared (html_tag::attrValue, guards against
+// "data-align").
+Align BlockParser::alignFromAttrs(
+    const std::string& attrs,
+    bool centerTag
+){
     const std::string v = attrValue(attrs, "align");
     if (v.empty() && centerTag) {
         return Align::Center;
@@ -125,8 +145,10 @@ Align BlockParser::alignFromAttrs(const std::string& attrs, bool centerTag) {
     return Align::None;
 }
 
-
-void BlockParser::applyAlign(std::vector<BlockPtr>& blocks, Align align) {
+void BlockParser::applyAlign(
+    std::vector<BlockPtr>& blocks,
+    Align align
+){
     for (auto& b : blocks) {
         if (b->type == Block::Type::Paragraph) {
             b->align = align;

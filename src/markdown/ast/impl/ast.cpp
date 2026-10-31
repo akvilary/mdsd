@@ -36,9 +36,10 @@ std::vector<std::vector<InlineElement>> splitByLineBreaks(const std::vector<Inli
                 const size_t nl = t.find('\n', start);
                 if (nl == std::string::npos) {
                     if (start < t.size() || start == 0) {
-                        cur.push_back(InlineElement{
-                            InlineElement::Kind::Run,
-                            InlineRun{t.substr(start), e.run.style, e.run.link}, InlineImage{}});
+                        cur.push_back(
+                            InlineElement{InlineElement::Kind::Run,
+                                          InlineRun{t.substr(start), e.run.style, e.run.link},
+                                          InlineImage{}});
                     }
                     break;
                 }

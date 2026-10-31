@@ -14,14 +14,26 @@ namespace detail {
 
 // ---------------------------------------------------------------- dispatcher
 
-void mapSingleBlock(md::BlockPtr& b, std::vector<sd::BlockPtr>& dst, ResourceCollector& rc,
-                    bool topLevel, int depth) {
+void mapSingleBlock(md::BlockPtr& b,
+                    std::vector<sd::BlockPtr>& dst,
+                    ResourceCollector& rc,
+                    bool topLevel,
+                    int depth) {
     switch (b->type) {
     case md::Block::Type::Paragraph:
-        mapParagraph(*b, dst, rc, true);
+        mapParagraph(
+            *b,
+            dst,
+            rc,
+            true
+        );
         break;
     case md::Block::Type::Header:
-        mapHeader(*b, dst, topLevel);
+        mapHeader(
+            *b,
+            dst,
+            topLevel
+        );
         break;
     case md::Block::Type::Code: {
         auto c = newBlock(sd::Block::Kind::Code);
@@ -33,15 +45,26 @@ void mapSingleBlock(md::BlockPtr& b, std::vector<sd::BlockPtr>& dst, ResourceCol
         auto q = newBlock(sd::Block::Kind::Quote);
         std::vector<md::BlockPtr> flat;
         flattenQuotes(b->children, flat);
-        mapBlocks(flat, q->children, rc, false, depth + 1);
+        mapBlocks(
+            flat,
+            q->children, rc, false, depth + 1
+        );
         dst.push_back(std::move(q));
         break;
     }
     case md::Block::Type::List:
-        mapList(*b, dst, rc, depth);
+        mapList(
+            *b,
+            dst,
+            rc,
+            depth
+        );
         break;
     case md::Block::Type::Table:
-        mapTable(*b, dst);
+        mapTable(
+            *b,
+            dst
+        );
         break;
     case md::Block::Type::Rule:
         dst.push_back(newBlock(sd::Block::Kind::Separator));
@@ -49,13 +72,22 @@ void mapSingleBlock(md::BlockPtr& b, std::vector<sd::BlockPtr>& dst, ResourceCol
     }
 }
 
-void mapBlocks(std::vector<md::BlockPtr>& src, std::vector<sd::BlockPtr>& dst,
-               ResourceCollector& rc, bool topLevel, int depth) {
+void mapBlocks(std::vector<md::BlockPtr>& src,
+               std::vector<sd::BlockPtr>& dst,
+               ResourceCollector& rc,
+               bool topLevel,
+               int depth) {
     if (depth > kMaxDepth) {
         return;
     }
     for (size_t k = 0; k < src.size(); ++k) {
-        mapSingleBlock(src[k], dst, rc, topLevel, depth);
+        mapSingleBlock(
+            src[k],
+            dst,
+            rc,
+            topLevel,
+            depth
+        );
         // separator policy: after a special block — an empty paragraph if more content follows
         if (!dst.empty() && needsTrailingSeparator(dst.back()->kind) && k + 1 < src.size()) {
             dst.push_back(makeSeparatorMimic());
@@ -65,7 +97,11 @@ void mapBlocks(std::vector<md::BlockPtr>& src, std::vector<sd::BlockPtr>& dst,
 
 } // namespace detail
 
-sd::Document map(md::Document doc, ResourceCollector& rc, const Options& opt) {
+sd::Document map(
+    md::Document doc,
+    ResourceCollector& rc,
+    const Options& opt
+){
     sd::Document out;
     out.title = opt.title;
     out.pageName = opt.pageName;
@@ -74,7 +110,13 @@ sd::Document map(md::Document doc, ResourceCollector& rc, const Options& opt) {
     out.rootTextLayoutId = makeUuid4();
     out.headerId = makeUuid4();
     std::vector<md::BlockPtr> src = std::move(doc.blocks);
-    detail::mapBlocks(src, out.blocks, rc, true, 0);
+    detail::mapBlocks(
+        src,
+        out.blocks,
+        rc,
+        true,
+        0
+    );
     out.resources = rc.take();
     return out;
 }

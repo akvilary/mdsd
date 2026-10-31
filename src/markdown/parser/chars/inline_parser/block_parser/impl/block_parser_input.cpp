@@ -22,7 +22,10 @@ Document BlockParser::run(std::string text) {
 
 std::string BlockParser::normalize(std::string s) {
     if (s.starts_with("\xEF\xBB\xBF")) {
-        s.erase(0, 3);
+        s.erase(
+            0,
+            3
+        );
     }
     std::string noCr;
     noCr.reserve(s.size());
@@ -48,7 +51,10 @@ std::string BlockParser::expandLeadingTabs(const std::string& s) {
     for (const char ch : s) {
         if (leading && ch == '\t') {
             const size_t stop = ((col / 4) + 1) * 4;
-            out.append(stop - col, ' ');
+            out.append(
+                stop - col,
+                ' '
+            );
             col = stop;
             continue;
         }

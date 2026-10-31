@@ -1,4 +1,5 @@
-// Assembly of the final .sabydoc archive (ZIP store) from the model: content.json + index.site + resources.
+// Assembly of the final .sabydoc archive (ZIP store) from the model: content.json + index.site +
+// resources.
 
 #include <nlohmann/json.hpp>
 
@@ -59,10 +60,19 @@ std::string buildIndexSite(const Document& doc) {
 
 std::string buildSabydocArchive(const Document& doc) {
     ZipWriter zw;
-    zw.addFile("content.json", buildContentJson(doc.pageId));
-    zw.addFile("index.site", buildIndexSite(doc));
+    zw.addFile(
+        "content.json",
+        buildContentJson(doc.pageId)
+    );
+    zw.addFile(
+        "index.site",
+        buildIndexSite(doc)
+    );
     for (const Resource& r : doc.resources) {
-        zw.addFile("resources/" + r.zipName, r.bytes);
+        zw.addFile(
+            "resources/" + r.zipName,
+            r.bytes
+        );
     }
     return zw.finish();
 }

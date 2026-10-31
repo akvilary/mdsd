@@ -8,21 +8,40 @@ namespace detail {
 
 // ---------------------------------------------------------------- lists
 
-void mapBlocks(std::vector<md::BlockPtr>& src, std::vector<sd::BlockPtr>& dst,
-               ResourceCollector& rc, bool topLevel, int depth);
+void mapBlocks(std::vector<md::BlockPtr>& src,
+               std::vector<sd::BlockPtr>& dst,
+               ResourceCollector& rc,
+               bool topLevel,
+               int depth);
 
-sd::ListItem mapListItem(md::ListItem& item, ResourceCollector& rc, int depth) {
+sd::ListItem mapListItem(
+    md::ListItem& item,
+    ResourceCollector& rc,
+    int depth
+){
     sd::ListItem out;
     out.id = makeUuid4();
     out.checked = item.task && item.checked;
     out.content = sd::buildText(item.content);
     std::vector<md::BlockPtr> flat;
-    flattenQuotes(item.children, flat);
-    mapBlocks(flat, out.children, rc, false, depth + 1);
+    flattenQuotes(
+        item.children,
+        flat
+    );
+    mapBlocks(
+        flat,
+        out.children,
+        rc,
+        false,
+        depth + 1
+    );
     return out;
 }
 
-sd::ListMarker listMarkerOf(md::ListKind kind, bool anyTask) {
+sd::ListMarker listMarkerOf(
+    md::ListKind kind,
+    bool anyTask
+){
     if (anyTask) {
         return sd::ListMarker::Checkbox;
     }
@@ -36,7 +55,12 @@ sd::ListMarker listMarkerOf(md::ListKind kind, bool anyTask) {
     }
 }
 
-void mapList(md::Block& b, std::vector<sd::BlockPtr>& dst, ResourceCollector& rc, int depth) {
+void mapList(
+    md::Block& b,
+    std::vector<sd::BlockPtr>& dst,
+    ResourceCollector& rc,
+    int depth
+){
     auto lst = newBlock(sd::Block::Kind::List);
     bool anyTask = false;
     for (md::ListItem& item : b.items) {
@@ -62,7 +86,10 @@ sd::TableCell mapCell(const std::vector<md::InlineElement>& cell) {
     return c;
 }
 
-void mapTable(const md::Block& b, std::vector<sd::BlockPtr>& dst) {
+void mapTable(
+    const md::Block& b,
+    std::vector<sd::BlockPtr>& dst
+){
     auto t = newBlock(sd::Block::Kind::Table);
     for (md::Align a : b.colAlign) {
         t->colAlign.push_back(alignStr(a));

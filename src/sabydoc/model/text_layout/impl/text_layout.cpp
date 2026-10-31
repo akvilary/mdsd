@@ -99,7 +99,11 @@ Text buildText(const std::vector<md::InlineElement>& elems) {
                 open = true;
                 rangeStart = pos16;
             }
-            out.content.append(run.text, start, i - start);
+            out.content.append(
+                run.text,
+                start,
+                i - start
+            );
             pos16 += static_cast<size_t>(utf8::u16len(cp));
         }
     }
@@ -117,7 +121,8 @@ Text plainText(const std::string& s) {
     }
     std::vector<md::InlineElement> elems;
     elems.push_back(md::InlineElement{md::InlineElement::Kind::Run,
-                                      md::InlineRun{s, md::StyleFlags{}, ""}, md::InlineImage{}});
+                                      md::InlineRun{s, md::StyleFlags{}, ""},
+                                      md::InlineImage{}});
     return buildText(elems);
 }
 

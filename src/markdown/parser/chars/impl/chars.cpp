@@ -21,13 +21,16 @@ std::string_view rtrim(std::string_view s) {
 
 std::string_view trim(std::string_view s) { return rtrim(ltrim(s)); }
 
-std::string rtrimCopy(std::string s) {
-    return std::string(rtrim(s));
-}
+std::string rtrimCopy(std::string s) { return std::string(rtrim(s)); }
 
 std::string toLower(std::string s) {
-    std::ranges::transform(s, s.begin(),
-                           [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    std::ranges::transform(
+        s,
+        s.begin(),
+        [](unsigned char c
+    ){
+        return static_cast<char>(std::tolower(c));
+    });
     return s;
 }
 
@@ -36,7 +39,10 @@ size_t indentOf(std::string_view s) {
     return static_cast<size_t>(it - s.begin());
 }
 
-std::vector<std::string_view> splitBy(std::string_view s, char sep) {
+std::vector<std::string_view> splitBy(
+    std::string_view s,
+    char sep
+){
     std::vector<std::string_view> parts;
     size_t start = 0;
     while (true) {

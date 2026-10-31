@@ -17,7 +17,12 @@ bool isAtx(std::string_view line) {
     return hashes <= 6 && (p + hashes >= line.size() || line[p + hashes] == ' ');
 }
 
-bool isFenceLine(const std::string& line, char& fenceChar, size_t& fenceLen, std::string& info) {
+bool isFenceLine(
+    const std::string& line,
+    char& fenceChar,
+    size_t& fenceLen,
+    std::string& info
+){
     const size_t p = indentOf(line);
     if (p > 3 || p >= line.size()) {
         return false;
@@ -56,7 +61,10 @@ bool isHr(const std::string& line) {
     return static_cast<size_t>(std::ranges::count(rest, c)) >= 3;
 }
 
-bool isSetextUnderline(const std::string& line, int& level) {
+bool isSetextUnderline(
+    const std::string& line,
+    int& level
+){
     const size_t p = indentOf(line);
     if (p > 3 || p >= line.size()) {
         return false;

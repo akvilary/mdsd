@@ -58,7 +58,10 @@ enum class ArgsResult {
     UsageError, ///< Invalid arguments: message already printed, show usage
 };
 
-ArgsResult parseArgs(std::span<char* const> args, Args& out) {
+ArgsResult parseArgs(
+    std::span<char* const> args,
+    Args& out
+){
     if (args.size() < 2) {
         return ArgsResult::UsageError;
     }
@@ -67,7 +70,11 @@ ArgsResult parseArgs(std::span<char* const> args, Args& out) {
         const std::string a = args[i];
         auto needValue = [&](const char* name) -> const char* {
             if (i + 1 >= args.size()) {
-                std::fprintf(stderr, "Error: %s requires a value\n", name);
+                std::fprintf(
+                    stderr,
+                    "Error: %s requires a value\n",
+                    name
+                );
                 std::exit(2);
             }
             ++i;
@@ -88,29 +95,49 @@ ArgsResult parseArgs(std::span<char* const> args, Args& out) {
             printUsage();
             return ArgsResult::HelpShown;
         } else if (a == "--version") {
-            std::printf("mdsd %s\n", kVersion);
+            std::printf(
+                "mdsd %s\n",
+                kVersion
+            );
             return ArgsResult::HelpShown;
         } else if (!a.empty() && a[0] == '-') {
-            std::fprintf(stderr, "Error: unknown option %s\n", a.c_str());
+            std::fprintf(
+                stderr,
+                "Error: unknown option %s\n",
+                a.c_str()
+            );
             return ArgsResult::UsageError;
         } else if (!haveInput) {
             out.input = a;
             haveInput = true;
         } else {
-            std::fprintf(stderr, "Error: extra positional argument %s\n", a.c_str());
+            std::fprintf(
+                stderr,
+                "Error: extra positional argument %s\n",
+                a.c_str()
+            );
             return ArgsResult::UsageError;
         }
     }
     if (!haveInput) {
-        std::fprintf(stderr, "Error: input file not specified\n");
+        std::fprintf(
+            stderr,
+            "Error: input file not specified\n"
+        );
         return ArgsResult::UsageError;
     }
     return ArgsResult::Ok;
 }
 
 /// \brief Reads a file into a string. Sets ok=false on failure.
-std::string readFile(const std::filesystem::path& p, bool& ok) {
-    std::ifstream f(p, std::ios::binary);
+std::string readFile(
+    const std::filesystem::path& p,
+    bool& ok
+){
+    std::ifstream f(
+        p,
+        std::ios::binary
+    );
     if (!f) {
         ok = false;
         return {};
@@ -120,24 +147,39 @@ std::string readFile(const std::filesystem::path& p, bool& ok) {
 }
 
 /// \brief Writes bytes to a file. Returns false on failure.
-bool writeFile(const std::filesystem::path& p, const std::string& bytes) {
-    std::ofstream f(p, std::ios::binary | std::ios::trunc);
+bool writeFile(
+    const std::filesystem::path& p,
+    const std::string& bytes
+){
+    std::ofstream f(
+        p,
+        std::ios::binary | std::ios::trunc
+    );
     if (!f) {
         return false;
     }
-    f.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+    f.write(
+        bytes.data(),
+        static_cast<std::streamsize>(bytes.size())
+    );
     return static_cast<bool>(f);
 }
 
 /// \brief Computes the default output path from the input path and direction.
-std::filesystem::path defaultOutput(const std::filesystem::path& input, bool reverse) {
+std::filesystem::path defaultOutput(
+    const std::filesystem::path& input,
+    bool reverse
+){
     const auto ext = reverse ? ".md" : ".sabydoc";
     return input.parent_path() / (input.stem().string() + ext);
 }
 
 } // namespace
 
-int main(int argc, char** argv) {
+int main(
+    int argc,
+    char** argv
+){
     Args args;
     switch (parseArgs(std::span<char* const>(argv, static_cast<size_t>(argc)), args)) {
     case ArgsResult::HelpShown:
@@ -150,7 +192,10 @@ int main(int argc, char** argv) {
     }
 
     if (args.reverse) {
-        std::fprintf(stderr, "Error: reverse conversion (sabydoc -> md) is not yet implemented\n");
+        std::fprintf(
+            stderr,
+            "Error: reverse conversion (sabydoc -> md) is not yet implemented\n"
+        );
         return 1;
     }
 
@@ -158,7 +203,11 @@ int main(int argc, char** argv) {
     const fs::path input(args.input);
     std::error_code ec;
     if (!fs::exists(input, ec) || fs::is_directory(input, ec)) {
-        std::fprintf(stderr, "Error: input file not found: %s\n", args.input.c_str());
+        std::fprintf(
+            stderr,
+            "Error: input file not found: %s\n",
+            args.input.c_str()
+        );
         return 1;
     }
     fs::path output(args.output);
@@ -166,14 +215,21 @@ int main(int argc, char** argv) {
         output = defaultOutput(input, args.reverse);
     }
     if (fs::weakly_canonical(input, ec) == fs::weakly_canonical(output, ec)) {
-        std::fprintf(stderr, "Error: output file is the same as input\n");
+        std::fprintf(
+            stderr,
+            "Error: output file is the same as input\n"
+        );
         return 1;
     }
 
     bool ok = false;
     const std::string text = readFile(input, ok);
     if (!ok) {
-        std::fprintf(stderr, "Error: cannot read %s\n", args.input.c_str());
+        std::fprintf(
+            stderr,
+            "Error: cannot read %s\n",
+            args.input.c_str()
+        );
         return 1;
     }
 
@@ -189,7 +245,10 @@ int main(int argc, char** argv) {
     }
 
     std::vector<std::string> diagnostics = std::move(doc.warnings);
-    ResourceCollector rc(input.parent_path(), diagnostics);
+    ResourceCollector rc(
+        input.parent_path(),
+        diagnostics
+    );
     mapping::Options mopt;
     mopt.title = title;
     mopt.pageName = args.pageName;
@@ -200,12 +259,20 @@ int main(int argc, char** argv) {
     try {
         bytes = sd::buildSabydocArchive(sdoc);
     } catch (const std::exception& e) {
-        std::fprintf(stderr, "Error building archive: %s\n", e.what());
+        std::fprintf(
+            stderr,
+            "Error building archive: %s\n",
+            e.what()
+        );
         return 1;
     }
 
     if (!writeFile(output, bytes)) {
-        std::fprintf(stderr, "Error: cannot write %s\n", output.string().c_str());
+        std::fprintf(
+            stderr,
+            "Error: cannot write %s\n",
+            output.string().c_str()
+        );
         return 1;
     }
 
@@ -216,15 +283,28 @@ int main(int argc, char** argv) {
         }
     }
 
-    std::printf("Done: %s (%zu bytes)\n", output.string().c_str(), bytes.size());
-    std::printf("  blocks: %zu, headers: %zu, images: %zu\n", sdoc.blocks.size(), headers,
+    std::printf(
+        "Done: %s (%zu bytes)\n",
+        output.string().c_str(),
+        bytes.size()
+    );
+    std::printf("  blocks: %zu, headers: %zu, images: %zu\n",
+                sdoc.blocks.size(),
+                headers,
                 imageCount);
     for (const std::string& w : diagnostics) {
-        std::printf("  [warning] %s\n", w.c_str());
+        std::printf(
+            "  [warning] %s\n",
+            w.c_str()
+        );
     }
 
     if (args.strict && !diagnostics.empty()) {
-        std::fprintf(stderr, "--strict: %zu warnings\n", diagnostics.size());
+        std::fprintf(
+            stderr,
+            "--strict: %zu warnings\n",
+            diagnostics.size()
+        );
         return 3;
     }
     return 0;

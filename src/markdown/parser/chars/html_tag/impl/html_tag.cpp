@@ -9,7 +9,10 @@ namespace md::detail {
 
 namespace {
 
-std::string readTagAttrs(const std::string& s, size_t& p) {
+std::string readTagAttrs(
+    const std::string& s,
+    size_t& p
+){
     std::string attrs;
     while (p < s.size() && s[p] != '>') {
         if (ut::isOneOf(s[p], '"', '\'')) {
@@ -28,7 +31,10 @@ std::string readTagAttrs(const std::string& s, size_t& p) {
     return attrs;
 }
 
-std::string readAttrValue(const std::string& attrs, size_t v) {
+std::string readAttrValue(
+    const std::string& attrs,
+    size_t v
+){
     while (v < attrs.size() && isSpaceCh(attrs[v])) {
         ++v;
     }
@@ -38,7 +44,8 @@ std::string readAttrValue(const std::string& attrs, size_t v) {
         return attrs.substr(v, (e == std::string::npos ? attrs.size() : e) - v);
     }
     size_t e = v;
-    while (e < attrs.size() && !isSpaceCh(attrs[e]) && attrs[e] != '>') { // '>' is not allowed in the value
+    while (e < attrs.size() && !isSpaceCh(attrs[e]) &&
+           attrs[e] != '>') { // '>' is not allowed in the value
         ++e;
     }
     return attrs.substr(v, e - v);
@@ -46,7 +53,11 @@ std::string readAttrValue(const std::string& attrs, size_t v) {
 
 } // namespace
 
-bool matchHtmlTag(const std::string& s, size_t pos, HtmlTag& out) {
+bool matchHtmlTag(
+    const std::string& s,
+    size_t pos,
+    HtmlTag& out
+){
     if (pos >= s.size() || s[pos] != '<') {
         return false;
     }
@@ -74,15 +85,18 @@ bool matchHtmlTag(const std::string& s, size_t pos, HtmlTag& out) {
     return true;
 }
 
-std::string attrValue(const std::string& attrs, const std::string& name) {
+std::string attrValue(
+    const std::string& attrs,
+    const std::string& name
+){
     const std::string pat = toLower(name) + "=";
     const std::string low = toLower(attrs);
     size_t p = 0;
     while ((p = low.find(pat, p)) != std::string::npos) {
         // name boundary: "data-align"/"data-src" must not match as align/src
         const char prev = (p > 0) ? attrs[p - 1] : '\0';
-        const bool boundary = prev == '\0' ||
-                              (!isWordByte(static_cast<unsigned char>(prev)) && prev != '-');
+        const bool boundary =
+            prev == '\0' || (!isWordByte(static_cast<unsigned char>(prev)) && prev != '-');
         if (boundary) {
             return readAttrValue(attrs, p + pat.size());
         }
@@ -91,7 +105,11 @@ std::string attrValue(const std::string& attrs, const std::string& name) {
     return {};
 }
 
-size_t findClosingTag(const std::string& s, size_t from, const std::string& name) {
+size_t findClosingTag(
+    const std::string& s,
+    size_t from,
+    const std::string& name
+){
     const std::string low = toLower(s);
     size_t p = low.find("</" + name, from);
     while (p != std::string::npos) {
@@ -126,7 +144,10 @@ int styleTagKind(const std::string& name) {
     return 0;
 }
 
-StyleFlags withTagStyle(StyleFlags st, int kind) {
+StyleFlags withTagStyle(
+    StyleFlags st,
+    int kind
+){
     switch (kind) {
     case 1:
         st.bold = true;

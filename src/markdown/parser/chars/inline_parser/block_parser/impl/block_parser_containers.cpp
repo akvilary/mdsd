@@ -138,7 +138,10 @@ std::vector<std::string> BlockParser::gatherItem(const Marker& m) {
     return item;
 }
 
-bool BlockParser::handleItemBlank(std::vector<std::string>& item, size_t contentIndent) {
+bool BlockParser::handleItemBlank(
+    std::vector<std::string>& item,
+    size_t contentIndent
+){
     if (!isBlank(mLines[mCursor])) {
         return false;
     }
@@ -154,10 +157,14 @@ bool BlockParser::handleItemBlank(std::vector<std::string>& item, size_t content
     return false;
 }
 
-bool BlockParser::makeListItem(std::vector<std::string> raw, std::vector<ListItem>& out,
+bool BlockParser::makeListItem(std::vector<std::string> raw,
+                               std::vector<ListItem>& out,
                                int depth) {
     ListItem item;
-    stripTaskPrefix(raw, item);
+    stripTaskPrefix(
+        raw,
+        item
+    );
     std::vector<BlockPtr> sub = parseInner(raw, depth + 1);
     if (!sub.empty() && sub[0]->type == Block::Type::Paragraph) {
         item.content = std::move(sub[0]->inlines);
@@ -169,7 +176,10 @@ bool BlockParser::makeListItem(std::vector<std::string> raw, std::vector<ListIte
     return task;
 }
 
-void BlockParser::stripTaskPrefix(std::vector<std::string>& raw, ListItem& item) {
+void BlockParser::stripTaskPrefix(
+    std::vector<std::string>& raw,
+    ListItem& item
+){
     if (raw.empty()) {
         return;
     }

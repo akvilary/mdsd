@@ -12,7 +12,12 @@ namespace md::detail {
 
 namespace {
 
-bool decodeNumericEntity(const std::string& body, std::string& out, size_t& end, size_t sc) {
+bool decodeNumericEntity(
+    const std::string& body,
+    std::string& out,
+    size_t& end,
+    size_t sc
+){
     unsigned long cp = 0;
     try {
         if (body.size() > 1 && ut::isOneOf(body[1], 'x', 'X')) {
@@ -33,11 +38,17 @@ bool decodeNumericEntity(const std::string& body, std::string& out, size_t& end,
         return false;
     }
     end = sc + 1;
-    utf8::append(static_cast<char32_t>(cp), std::back_inserter(out)); // encoding is done by the library
+    utf8::append(static_cast<char32_t>(cp),
+                 std::back_inserter(out)); // encoding is done by the library
     return true;
 }
 
-bool decodeNamedEntity(const std::string& body, std::string& out, size_t& end, size_t sc) {
+bool decodeNamedEntity(
+    const std::string& body,
+    std::string& out,
+    size_t& end,
+    size_t sc
+){
     static const std::map<std::string, std::string> kMap = {
         {"amp", "&"},
         {"lt", "<"},
@@ -91,7 +102,12 @@ bool decodeNamedEntity(const std::string& body, std::string& out, size_t& end, s
 
 } // namespace
 
-bool decodeEntity(const std::string& s, size_t pos, size_t& end, std::string& out) {
+bool decodeEntity(
+    const std::string& s,
+    size_t pos,
+    size_t& end,
+    std::string& out
+){
     const size_t sc = s.find(';', pos + 1);
     if (sc == std::string::npos || sc - pos > 12 || sc == pos + 1) {
         return false;

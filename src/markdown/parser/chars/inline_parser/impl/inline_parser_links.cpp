@@ -16,10 +16,20 @@ bool InlineParser::lookupDef(const std::string& rawLabel, LinkDef& out) const {
 }
 
 // Link target: (destination) / [ref] / [ref][] / collapsed [ref]. false — not a link.
-bool InlineParser::resolveTarget(const std::string& s, size_t close, const std::string& inner,
-                                 std::string& url, std::string& title, size_t& after) const {
+bool InlineParser::resolveTarget(const std::string& s,
+                                 size_t close,
+                                 const std::string& inner,
+                                 std::string& url,
+                                 std::string& title,
+                                 size_t& after) const {
     if (close + 1 < s.size() && s[close + 1] == '(' &&
-        parseDestination(s, close + 1, url, title, after)) {
+        parseDestination(
+            s,
+            close + 1,
+            url,
+            title,
+            after)
+        ){
         return true;
     }
     std::string label = inner;
@@ -44,7 +54,9 @@ bool InlineParser::resolveTarget(const std::string& s, size_t close, const std::
     return true;
 }
 
-size_t InlineParser::tryImage(const Ctx& c, size_t i, std::vector<InlineElement>& out,
+size_t InlineParser::tryImage(const Ctx& c,
+                              size_t i,
+                              std::vector<InlineElement>& out,
                               std::string& buf) const {
     const size_t close = matchBracket(c.s, i + 1);
     if (close == std::string::npos) {
@@ -60,12 +72,18 @@ size_t InlineParser::tryImage(const Ctx& c, size_t i, std::vector<InlineElement>
     img.url = url;
     img.alt = alt;
     img.title = title;
-    emitRun(c, out, buf);
+    emitRun(
+        c,
+        out,
+        buf
+    );
     out.push_back(InlineElement{InlineElement::Kind::Image, InlineRun{}, std::move(img)});
     return after - i;
 }
 
-size_t InlineParser::tryLink(const Ctx& c, size_t i, std::vector<InlineElement>& out,
+size_t InlineParser::tryLink(const Ctx& c,
+                             size_t i,
+                             std::vector<InlineElement>& out,
                              std::string& buf) const {
     const size_t close = matchBracket(c.s, i);
     if (close == std::string::npos) {
@@ -77,20 +95,35 @@ size_t InlineParser::tryLink(const Ctx& c, size_t i, std::vector<InlineElement>&
     if (!resolveTarget(c.s, close, inner, url, title, after)) {
         return 0;
     }
-    emitRun(c, out, buf);
+    emitRun(
+        c,
+        out,
+        buf
+    );
     const Ctx innerCtx{inner, c.st, url, c.depth + 1};
-    emitAll(c, out, buf, parseRec(innerCtx));
+    emitAll(
+        c,
+        out,
+        buf,
+        parseRec(innerCtx)
+    );
     return after - i;
 }
 
-size_t InlineParser::tryBareUrl(const Ctx& c, size_t i, std::vector<InlineElement>& out,
+size_t InlineParser::tryBareUrl(const Ctx& c,
+                                size_t i,
+                                std::vector<InlineElement>& out,
                                 std::string& buf) const {
-    const std::string_view rest(c.s.data() + i, c.s.size() - i);
+    const std::string_view rest(
+        c.s.data() + i,
+        c.s.size() - i
+    );
     if (!rest.starts_with("http://") && !rest.starts_with("https://")) {
         return 0;
     }
     const char prev = (i > 0) ? c.s[i - 1] : '\0';
-    if (prev != '\0' && isWordByte(static_cast<unsigned char>(prev))) { // not in the middle of a word
+    if (prev != '\0' &&
+        isWordByte(static_cast<unsigned char>(prev))) { // not in the middle of a word
         return 0;
     }
     size_t end = i;
@@ -101,15 +134,23 @@ size_t InlineParser::tryBareUrl(const Ctx& c, size_t i, std::vector<InlineElemen
     if (url.size() <= 8 || url.find('.') == std::string::npos) {
         return 0;
     }
-    emitRun(c, out, buf);
+    emitRun(
+        c,
+        out,
+        buf
+    );
     out.push_back(
         InlineElement{InlineElement::Kind::Run, InlineRun{url, c.st, url}, InlineImage{}});
     return consumedTo - i;
 }
 
 // Strip trailing punctuation and extra unbalanced ')'
-std::pair<std::string, size_t> InlineParser::trimUrlPunctuation(const std::string& s, size_t from,
-                                                                size_t to) {
+std::pair<std::string, size_t>
+InlineParser::trimUrlPunctuation(
+    const std::string& s,
+    size_t from,
+    size_t to
+){
     size_t t = to;
     while (t > from && std::string_view(".,;:!?").find(s[t - 1]) != std::string_view::npos) {
         --t;

@@ -23,7 +23,8 @@ Json writeHeader(const Block& b) {
     attrs["size"] = b.level;
     attrs["textStyle"] = "default";
     return Json::array({"ModuleEditor/baseWidgets:Header" + std::to_string(b.level),
-                        std::move(attrs), writeFormattedText(b.text)});
+                        std::move(attrs),
+                        writeFormattedText(b.text)});
 }
 
 Json writeCode(const Block& b) {

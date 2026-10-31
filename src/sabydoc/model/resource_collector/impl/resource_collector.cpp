@@ -20,7 +20,12 @@ std::string fnv1a8(const std::string& s) {
         h *= 1099511628211ull;
     }
     char buf[16];
-    std::snprintf(buf, sizeof(buf), "%08llx", static_cast<unsigned long long>((h >> 32) ^ h));
+    std::snprintf(
+        buf,
+        sizeof(buf),
+        "%08llx",
+        static_cast<unsigned long long>((h >> 32) ^ h)
+    );
     return buf;
 }
 
@@ -56,8 +61,14 @@ std::string sanitizeName(const std::string& name) {
     return "img_" + fnv1a8(name) + ext;
 }
 
-std::string readFileBytes(const std::filesystem::path& p, bool& ok) {
-    std::ifstream f(p, std::ios::binary);
+std::string readFileBytes(
+    const std::filesystem::path& p,
+    bool& ok
+){
+    std::ifstream f(
+        p,
+        std::ios::binary
+    );
     if (!f) {
         ok = false;
         return {};
@@ -72,11 +83,14 @@ ResourceCollector::ResourceCollector(std::filesystem::path baseDir,
                                      std::vector<std::string>& diagnostics)
     : mBaseDir(std::move(baseDir)), mDiagnostics(diagnostics) {}
 
-std::string ResourceCollector::addImage(const std::string& url, unsigned& width, unsigned& height) {
+std::string ResourceCollector::addImage(
+    const std::string& url,
+    unsigned& width,
+    unsigned& height
+){
     width = height = 0;
     if (isRemote(url)) {
-        mDiagnostics.push_back("remote image not fetched (no network dependencies): " +
-                               url);
+        mDiagnostics.push_back("remote image not fetched (no network dependencies): " + url);
         return "";
     }
     std::filesystem::path p(url);
@@ -137,7 +151,10 @@ std::string ResourceCollector::addImage(const std::string& url, unsigned& width,
     height = r.height;
 
     const std::string rk = r.key;
-    mByPath.emplace(key, std::move(r));
+    mByPath.emplace(
+        key,
+        std::move(r)
+    );
     return rk;
 }
 

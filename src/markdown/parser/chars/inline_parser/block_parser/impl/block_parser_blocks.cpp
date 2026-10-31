@@ -30,7 +30,10 @@ BlockPtr BlockParser::skipRestOfComment(size_t after) {
     const std::string rest(trim(mLines[mCursor].substr(after)));
     ++mCursor;
     if (!rest.empty()) {
-        mLines.insert(mLines.begin() + static_cast<std::ptrdiff_t>(mCursor), rest);
+        mLines.insert(
+            mLines.begin() + static_cast<std::ptrdiff_t>(mCursor),
+            rest
+        );
     }
     return nullptr;
 }
@@ -55,7 +58,10 @@ BlockPtr BlockParser::tryFence() {
     return b;
 }
 
-std::vector<std::string> BlockParser::collectFenceBody(char fc, size_t fl) {
+std::vector<std::string> BlockParser::collectFenceBody(
+    char fc,
+    size_t fl
+){
     std::vector<std::string> body;
     while (mCursor < mLines.size()) {
         char c2 = 0;
@@ -76,7 +82,10 @@ std::string BlockParser::firstWord(const std::string& s) {
     return sp == std::string::npos ? s : s.substr(0, sp);
 }
 
-std::string BlockParser::dedentJoin(const std::vector<std::string>& body, size_t indent) {
+std::string BlockParser::dedentJoin(
+    const std::vector<std::string>& body,
+    size_t indent
+){
     std::string out;
     for (size_t k = 0; k < body.size(); ++k) {
         if (k) {

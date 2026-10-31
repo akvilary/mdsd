@@ -68,10 +68,9 @@ TEST(Cyrillic, HeadersAndSetext) {
 // --- Tables with Cyrillic and escaped pipes ---
 
 TEST(Cyrillic, TableWithCyrillicAndEscapedPipes) {
-    const md::Document d = parseMd(
-        "| Русская колонка | English |\n"
-        "|-----------------|---------|\n"
-        "| Значение с \\| пайпом | Value |");
+    const md::Document d = parseMd("| Русская колонка | English |\n"
+                                   "|-----------------|---------|\n"
+                                   "| Значение с \\| пайпом | Value |");
     ASSERT_EQ(d.blocks.size(), 1u);
     ASSERT_EQ(d.blocks[0]->type, md::Block::Type::Table);
     EXPECT_EQ(md::plainText(d.blocks[0]->rows[1][0]), "Значение с | пайпом");
@@ -96,7 +95,8 @@ TEST(Cyrillic, TextLayoutU16OffsetsMixedScripts) {
     const size_t expected = 6 + 1 + 2 + 1 + 3; // = 13
     auto makeElem = [](const std::string& s) {
         return md::InlineElement{md::InlineElement::Kind::Run,
-                                 md::InlineRun{s, md::StyleFlags{}, ""}, md::InlineImage{}};
+                                 md::InlineRun{s, md::StyleFlags{}, ""},
+                                 md::InlineImage{}};
     };
     const auto result = sd::buildText({makeElem(text)});
     EXPECT_EQ(result.content, text);
@@ -112,16 +112,17 @@ TEST(Cyrillic, TextLayoutBoldCyrillicOffsets) {
     // "До" (2 u16) + "Жирный" (6 u16) + "После" (5 u16) = 13 u16
     auto run = [](std::string t, md::StyleFlags st = {}) {
         return md::InlineElement{md::InlineElement::Kind::Run,
-                                 md::InlineRun{std::move(t), st, ""}, md::InlineImage{}};
+                                 md::InlineRun{std::move(t), st, ""},
+                                 md::InlineImage{}};
     };
     auto t = sd::buildText({run("До "), run("Жирный", bold), run("После")});
     ASSERT_EQ(t.formats.size(), 3u);
-    EXPECT_EQ(t.formats[0].offset, 0u);  // "До " = 3 u16
+    EXPECT_EQ(t.formats[0].offset, 0u); // "До " = 3 u16
     EXPECT_EQ(t.formats[0].length, 3u);
-    EXPECT_EQ(t.formats[1].offset, 3u);  // "Жирный" = 6 u16
+    EXPECT_EQ(t.formats[1].offset, 3u); // "Жирный" = 6 u16
     EXPECT_EQ(t.formats[1].length, 6u);
     EXPECT_FALSE(t.formats[1].bold == false); // bold
-    EXPECT_EQ(t.formats[2].offset, 9u);  // "После" = 5 u16
+    EXPECT_EQ(t.formats[2].offset, 9u);       // "После" = 5 u16
     EXPECT_EQ(t.formats[2].length, 5u);
     EXPECT_TRUE(t.formats[2].length == 5u);
 }
@@ -129,7 +130,8 @@ TEST(Cyrillic, TextLayoutBoldCyrillicOffsets) {
 // --- Front matter and task lists with Cyrillic ---
 
 TEST(Cyrillic, FrontMatterAndTaskLists) {
-    const md::Document d = parseMd("---\ntitle: Русский заголовок\n---\n\n- [x] Выполнено\n- [ ] Не выполнено");
+    const md::Document d =
+        parseMd("---\ntitle: Русский заголовок\n---\n\n- [x] Выполнено\n- [ ] Не выполнено");
     EXPECT_EQ(d.title, "Русский заголовок");
     ASSERT_EQ(d.blocks.size(), 1u);
     EXPECT_EQ(d.blocks[0]->listKind, md::ListKind::Task);
@@ -179,4 +181,4 @@ TEST(Cyrillic, HtmlTagsWithCyrillicContent) {
     checkInline("<i>Курсив</i> и обычный текст", "[Курсив|I|][ и обычный текст||]");
 }
 
-} // namespace test
+} // namespace

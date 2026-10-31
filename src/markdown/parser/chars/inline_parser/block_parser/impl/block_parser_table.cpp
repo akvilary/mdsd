@@ -34,7 +34,10 @@ BlockPtr BlockParser::buildTable(const std::vector<std::string>& headerCells,
             break;
         }
         std::vector<std::string> cells = splitTableRow(l);
-        cells.resize(headerCells.size(), std::string());
+        cells.resize(
+            headerCells.size(),
+            std::string()
+        );
         b->rows.push_back(parseCells(cells));
         ++mCursor;
     }

@@ -10,7 +10,10 @@
 namespace md::detail {
 
 std::vector<InlineElement> BlockParser::parseInline(const std::string& s) {
-    InlineParser p(mDefs, mWarnings);
+    InlineParser p(
+        mDefs,
+        mWarnings
+    );
     return p.parse(s);
 }
 
@@ -25,12 +28,18 @@ std::vector<BlockPtr> BlockParser::parseBlocks(int depth) {
             ++mCursor;
             continue;
         }
-        drainPending(parseOne(depth), out);
+        drainPending(
+            parseOne(depth),
+            out
+        );
     }
     return out;
 }
 
-void BlockParser::drainPending(BlockPtr b, std::vector<BlockPtr>& out) {
+void BlockParser::drainPending(
+    BlockPtr b,
+    std::vector<BlockPtr>& out
+){
     while (true) {
         if (b) {
             out.push_back(std::move(b));
@@ -74,7 +83,10 @@ BlockPtr BlockParser::parseOne(int depth) {
     return parseParagraph();
 }
 
-std::vector<BlockPtr> BlockParser::parseInner(const std::vector<std::string>& inner, int depth) {
+std::vector<BlockPtr> BlockParser::parseInner(
+    const std::vector<std::string>& inner,
+    int depth
+){
     std::vector<std::string> saved = std::move(mLines);
     const size_t savedI = mCursor;
     mLines = inner;

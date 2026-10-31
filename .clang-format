@@ -5,3 +5,8 @@ AlwaysBreakTemplateDeclarations: Yes
 DerivePointerAlignment: false
 PointerAlignment: Left
 SortIncludes: false
+# Each function parameter on its own line when more than one
+BinPackParameters: false
+BinPackArguments: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllArgumentsOnNextLine: false

@@ -10,17 +10,17 @@
 
 namespace sd {
 
-/// \brief JSON type preserving key insertion order (the single alias definition).
+/// JSON type preserving key insertion order (the single alias definition).
 using Json = nlohmann::ordered_json;
 
-/// \brief Writes the root frame widget: ["frame", {meta, resources}, [layout...]].
-/// \param doc The source document model.
-/// \return The frame JSONML node.
+/// Writes the root frame widget: ["frame", {meta, resources}, [layout...]].
+/// Param doc: The source document model.
+/// Returns The frame JSONML node.
 Json writeFrame(const Document& doc);
 
-/// \brief Writes the table of contents: an array of toc_* entries.
-/// \param doc The source document model.
-/// \return A JSON array of toc_* entries.
+/// Writes the table of contents: an array of toc_* entries.
+/// Param doc: The source document model.
+/// Returns A JSON array of toc_* entries.
 Json writeTableOfContents(const Document& doc);
 
 } // namespace sd

@@ -7,7 +7,12 @@ namespace md::detail {
 
 namespace {
 
-Marker finishMarker(const std::string& line, size_t p, size_t mlen, bool ordered) {
+Marker finishMarker(
+    const std::string& line,
+    size_t p,
+    size_t mlen,
+    bool ordered
+){
     const size_t after = p + mlen;
     if (after >= line.size()) { // marker at end of line — empty item
         return {true, ordered, p, p + mlen + 1, std::string()};
