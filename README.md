@@ -48,7 +48,7 @@ mdsd INPUT.md [-o OUTPUT.sabydoc] [--title TEXT] [--page-name NAME] [--strict]
 Example:
 
 ```bash
-mdsd examples/test.md
+mdsd example.md
 ```
 
 ## What is converted
