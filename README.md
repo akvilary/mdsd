@@ -49,7 +49,6 @@ Example:
 
 ```bash
 mdsd examples/test.md
-python3 scripts/validate.py examples/test.sabydoc   # structural validation
 ```
 
 ## What is converted
