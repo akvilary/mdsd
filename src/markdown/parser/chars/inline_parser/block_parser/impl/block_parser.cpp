@@ -7,7 +7,7 @@
 #include "utf8/utf8.hpp"
 #include "markdown/parser/chars/chars.hpp"
 
-namespace md::detail {
+namespace md {
 
 std::vector<InlineElement> BlockParser::parseInline(const std::string& s) {
     InlineParser p(
@@ -97,4 +97,4 @@ std::vector<BlockPtr> BlockParser::parseInner(
     return out;
 }
 
-} // namespace md::detail
+} // namespace md

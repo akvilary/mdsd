@@ -10,7 +10,7 @@
 #include "sabydoc/model/model.hpp"
 #include "sabydoc/model/resource_collector/resource_collector.hpp"
 
-namespace mapping::detail {
+namespace mapping {
 
 /// Maximum container nesting depth accepted while mapping.
 constexpr int kMaxDepth = 64;
@@ -176,4 +176,4 @@ void mapTable(
     std::vector<sd::BlockPtr>& dst
 );
 
-} // namespace mapping::detail
+} // namespace mapping

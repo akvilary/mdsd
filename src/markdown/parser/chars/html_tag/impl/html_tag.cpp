@@ -6,7 +6,7 @@
 #include "algo/algo.hpp"
 #include "markdown/parser/chars/chars.hpp"
 
-namespace md::detail {
+namespace md {
 
 namespace {
 
@@ -171,4 +171,4 @@ StyleFlags withTagStyle(
     return st;
 }
 
-} // namespace md::detail
+} // namespace md

@@ -9,7 +9,7 @@
 #include "markdown/parser/chars/detectors/detectors.hpp"
 #include "markdown/parser/chars/marker/marker.hpp"
 
-namespace md::detail {
+namespace md {
 
 namespace {
 
@@ -170,4 +170,4 @@ void BlockParser::stripTaskPrefix(
     raw[0] = raw[0].substr(4);
 }
 
-} // namespace md::detail
+} // namespace md

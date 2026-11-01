@@ -4,7 +4,7 @@
 
 #include "markdown/parser/chars/chars.hpp"
 
-namespace md::detail {
+namespace md {
 
 std::vector<std::string> splitTableRow(const std::string& line) {
     // escaped pipe -> one temporary marker (exactly one!)
@@ -79,4 +79,4 @@ std::optional<std::vector<Align>> tableDelimiters(const std::string& line) {
     return aligns;
 }
 
-} // namespace md::detail
+} // namespace md

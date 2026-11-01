@@ -6,7 +6,7 @@
 
 #include "markdown/ast/ast.hpp"
 
-namespace md::detail {
+namespace md {
 
 /// A parsed inline HTML tag.
 struct HtmlTag {
@@ -61,4 +61,4 @@ StyleFlags withTagStyle(
     int kind
 );
 
-} // namespace md::detail
+} // namespace md

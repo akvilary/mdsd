@@ -11,7 +11,7 @@
 #include <string_view>
 #include <vector>
 
-namespace md::detail {
+namespace md {
 
 /// Checks whether the character is a space or tab.
 /// Param c: Character to check.
@@ -104,4 +104,4 @@ std::vector<std::string_view> splitBy(
     char sep
 );
 
-} // namespace md::detail
+} // namespace md

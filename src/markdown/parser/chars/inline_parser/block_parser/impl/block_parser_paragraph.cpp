@@ -8,7 +8,7 @@
 #include "markdown/parser/chars/marker/marker.hpp"
 #include "markdown/parser/chars/table_row/table_row.hpp"
 
-namespace md::detail {
+namespace md {
 
 bool BlockParser::interruptsParagraph(const std::string& line, size_t idx) const {
     if (isAtx(line) || isHr(line) || isQuoteStart(line)) {
@@ -153,4 +153,4 @@ std::string BlockParser::joinCollected(
     return out;
 }
 
-} // namespace md::detail
+} // namespace md

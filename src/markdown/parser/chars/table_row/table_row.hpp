@@ -8,7 +8,7 @@
 
 #include "markdown/ast/ast.hpp"
 
-namespace md::detail {
+namespace md {
 
 /// Splits a table-row line into raw cell strings (escaped pipes kept as '|').
 /// Param line: Source line.
@@ -25,4 +25,4 @@ std::optional<Align> delimiterCellAlign(const std::string& c);
 /// Returns Vector of alignments, or nullopt if the row is not a delimiter row.
 std::optional<std::vector<Align>> tableDelimiters(const std::string& line);
 
-} // namespace md::detail
+} // namespace md

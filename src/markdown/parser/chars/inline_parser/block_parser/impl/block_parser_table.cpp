@@ -4,7 +4,7 @@
 
 #include "markdown/parser/chars/table_row/table_row.hpp"
 
-namespace md::detail {
+namespace md {
 
 BlockPtr BlockParser::tryTableStart() {
     if (mLines[mCursor].find('|') == std::string::npos || mCursor + 1 >= mLines.size()) {
@@ -56,4 +56,4 @@ BlockParser::parseCells(const std::vector<std::string>& cells) {
     return out;
 }
 
-} // namespace md::detail
+} // namespace md

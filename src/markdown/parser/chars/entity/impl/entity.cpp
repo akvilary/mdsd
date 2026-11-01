@@ -8,7 +8,7 @@
 #include "algo/algo.hpp"
 #include "markdown/parser/chars/chars.hpp"
 
-namespace md::detail {
+namespace md {
 
 namespace {
 
@@ -135,4 +135,4 @@ std::string decodeEntities(const std::string& s) {
     return out;
 }
 
-} // namespace md::detail
+} // namespace md

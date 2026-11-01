@@ -42,6 +42,7 @@ mdsd INPUT.md [-o OUTPUT.sabydoc] [--title TEXT] [--page-name NAME] [--strict]
 - default output: the input name with the `.sabydoc` extension;
 - document title: `title:` from front matter → `--title` → filename stem;
 - `--strict`: warnings make the exit code 3 (useful in CI);
+- `--version`: print the version and exit;
 - exit codes: `0` success, `1` I/O error, `2` invalid arguments,
   `3` warnings in strict mode.
 

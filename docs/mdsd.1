@@ -1,5 +1,5 @@
 .\" mdsd — Markdown <-> SabyDoc converter
-.TH MDSD 1 "2026" "mdsd 1.0.0" "User Commands"
+.TH MDSD 1 "2026" "mdsd 0.0.7" "User Commands"
 .SH NAME
 mdsd \- Markdown to SabyDoc format converter
 .SH SYNOPSIS
@@ -10,6 +10,7 @@ mdsd \- Markdown to SabyDoc format converter
 .RB [ \-\-title\ TEXT ]
 .RB [ \-\-page\-name\ NAME ]
 .RB [ \-\-strict ]
+.RB [ \-\-version ]
 .SH DESCRIPTION
 Converts Markdown (CommonMark subset + GFM: tables, task lists, strikethrough,
 links, HTML subset) to SabyDoc document format. The output `.sabydoc` file is
@@ -29,6 +30,9 @@ Page name (default: "Basic").
 .TP
 .B \-\-strict
 Treat warnings as errors (exit code 3).
+.TP
+.B \-\-version
+Print the version and exit.
 .TP
 .BR "\-r\fR, "\fB \-\-reverse
 Reserved for reverse conversion (sabydoc -> md). Not yet implemented.

@@ -6,7 +6,7 @@
 #include "markdown/parser/chars/chars.hpp"
 #include "markdown/parser/chars/marker/marker.hpp"
 
-namespace md::detail {
+namespace md {
 
 bool isAtx(std::string_view line) {
     const size_t p = indentOf(line);
@@ -95,4 +95,4 @@ bool isOrderedListStartWithOne(const std::string& line) {
     return q < line.size() && ut::isOneOf(line[q], '.', ')');
 }
 
-} // namespace md::detail
+} // namespace md

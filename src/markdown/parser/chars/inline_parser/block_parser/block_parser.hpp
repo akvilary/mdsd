@@ -17,7 +17,7 @@
 #include "markdown/parser/chars/marker/marker.hpp"
 #include "markdown/parser/chars/table_row/table_row.hpp"
 
-namespace md::detail {
+namespace md {
 
 /// Block-level markdown parser: turns normalized input lines into a Document AST.
 class BlockParser {
@@ -367,4 +367,4 @@ class BlockParser {
                                      bool useBreaks);
 };
 
-} // namespace md::detail
+} // namespace md

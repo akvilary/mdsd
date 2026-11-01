@@ -4,7 +4,6 @@
 #include "sabydoc/model/text_layout/text_layout.hpp"
 
 namespace mapping {
-namespace detail {
 
 // ---------------------------------------------------------------- lists
 
@@ -100,5 +99,4 @@ void mapTable(
     dst.push_back(std::move(t));
 }
 
-} // namespace detail
 } // namespace mapping

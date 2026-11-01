@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace md::detail {
+namespace md {
 
 /// Detects an ATX heading line ("# ...").
 /// Param line: Source line.
@@ -49,4 +49,4 @@ bool isQuoteStart(const std::string& line);
 /// Returns true if the line starts an ordered list with number 1.
 bool isOrderedListStartWithOne(const std::string& line);
 
-} // namespace md::detail
+} // namespace md

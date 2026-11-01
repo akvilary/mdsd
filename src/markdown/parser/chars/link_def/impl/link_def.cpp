@@ -3,7 +3,7 @@
 #include "algo/algo.hpp"
 #include "markdown/parser/chars/chars.hpp"
 
-namespace md::detail {
+namespace md {
 
 std::string normalizeLabel(std::string s) {
     std::string out;
@@ -178,4 +178,4 @@ bool parseDestination(
     return !url.empty();
 }
 
-} // namespace md::detail
+} // namespace md

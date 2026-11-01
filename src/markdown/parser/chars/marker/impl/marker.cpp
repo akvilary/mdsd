@@ -3,7 +3,7 @@
 #include "algo/algo.hpp"
 #include "markdown/parser/chars/chars.hpp"
 
-namespace md::detail {
+namespace md {
 
 namespace {
 
@@ -50,4 +50,4 @@ Marker matchListMarker(const std::string& line) {
     return {};
 }
 
-} // namespace md::detail
+} // namespace md

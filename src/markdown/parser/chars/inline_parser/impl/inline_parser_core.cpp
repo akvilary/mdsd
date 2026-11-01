@@ -4,7 +4,7 @@
 
 #include "markdown/parser/chars/chars.hpp"
 
-namespace md::detail {
+namespace md {
 
 void InlineParser::warn(const std::string& msg) const { mWarnings.push_back(msg); }
 
@@ -170,4 +170,4 @@ std::vector<InlineElement> InlineParser::mergeRuns(std::vector<InlineElement> el
     return out;
 }
 
-} // namespace md::detail
+} // namespace md

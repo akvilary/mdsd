@@ -7,7 +7,7 @@
 #include "utf8/utf8.hpp"
 #include "markdown/parser/chars/chars.hpp"
 
-namespace md::detail {
+namespace md {
 
 Document BlockParser::run(std::string text) {
     text = normalize(std::move(text));
@@ -140,4 +140,4 @@ void BlockParser::prescanLinkDefs() {
     }
 }
 
-} // namespace md::detail
+} // namespace md

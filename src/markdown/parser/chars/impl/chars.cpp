@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <ranges>
 
-namespace md::detail {
+namespace md {
 
 bool isBlank(const std::string& s) { return std::ranges::all_of(s, isSpaceCh); }
 
@@ -56,4 +56,4 @@ std::vector<std::string_view> splitBy(
     }
 }
 
-} // namespace md::detail
+} // namespace md

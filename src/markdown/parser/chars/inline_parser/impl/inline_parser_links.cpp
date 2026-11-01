@@ -6,7 +6,7 @@
 
 #include "markdown/parser/chars/chars.hpp"
 
-namespace md::detail {
+namespace md {
 
 bool InlineParser::lookupDef(const std::string& rawLabel, LinkDef& out) const {
     const auto it = mDefs.find(normalizeLabel(rawLabel));
@@ -178,4 +178,4 @@ InlineParser::trimUrlPunctuation(
     return {std::move(url), t};
 }
 
-} // namespace md::detail
+} // namespace md

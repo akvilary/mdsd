@@ -6,7 +6,7 @@
 #include "markdown/parser/chars/chars.hpp"
 #include "markdown/parser/chars/table_row/table_row.hpp"
 
-namespace md::detail {
+namespace md {
 
 BlockPtr BlockParser::tryAlignWrapper(int depth) {
     const auto wrap = alignWrapper(mLines[mCursor]);
@@ -156,4 +156,4 @@ void BlockParser::applyAlign(
     }
 }
 
-} // namespace md::detail
+} // namespace md

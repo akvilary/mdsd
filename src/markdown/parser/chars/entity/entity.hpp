@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace md::detail {
+namespace md {
 
 /// Decodes a single entity starting at s[pos].
 /// Param s: Input string.
@@ -24,4 +24,4 @@ bool decodeEntity(
 /// Returns Copy of the string with every entity replaced by its UTF-8 value.
 std::string decodeEntities(const std::string& s);
 
-} // namespace md::detail
+} // namespace md

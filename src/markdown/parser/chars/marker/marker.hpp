@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace md::detail {
+namespace md {
 
 /// Result of matching a list marker on a line.
 struct Marker {
@@ -20,4 +20,4 @@ struct Marker {
 /// Returns Parsed marker; ok == false when the line does not start a list item.
 Marker matchListMarker(const std::string& line);
 
-} // namespace md::detail
+} // namespace md

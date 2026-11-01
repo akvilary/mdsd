@@ -5,7 +5,7 @@
 #include <string>
 #include <string_view>
 
-namespace md::detail {
+namespace md {
 
 /// A link definition: destination URL plus optional title.
 struct LinkDef {
@@ -53,4 +53,4 @@ bool parseDestination(
     size_t& after
 );
 
-} // namespace md::detail
+} // namespace md

@@ -5,7 +5,7 @@
 #include "markdown/parser/chars/chars.hpp"
 #include "markdown/parser/chars/detectors/detectors.hpp"
 
-namespace md::detail {
+namespace md {
 
 BlockPtr BlockParser::tryComment() {
     if (!trim(mLines[mCursor]).starts_with("<!--")) {
@@ -194,4 +194,4 @@ std::string BlockParser::joinLines(const std::vector<std::string>& body) {
     return out;
 }
 
-} // namespace md::detail
+} // namespace md

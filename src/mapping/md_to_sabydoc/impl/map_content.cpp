@@ -10,7 +10,6 @@
 #include "mapping/md_to_sabydoc/mappers.hpp"
 
 namespace mapping {
-namespace detail {
 
 std::string alignStr(md::Align a) {
     switch (a) {
@@ -194,5 +193,4 @@ void mapHeader(
     dst.push_back(std::move(p));
 }
 
-} // namespace detail
 } // namespace mapping

@@ -6,7 +6,7 @@
 
 #include "markdown/parser/chars/chars.hpp"
 
-namespace md::detail {
+namespace md {
 
 size_t InlineParser::tryEmphasis(
     const Ctx& c,
@@ -285,4 +285,4 @@ size_t InlineParser::tryStyledTag(
     return ((gt == std::string::npos) ? c.s.size() : gt + 1) - i;
 }
 
-} // namespace md::detail
+} // namespace md

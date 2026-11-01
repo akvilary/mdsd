@@ -5,6 +5,11 @@ set(CMAKE_CXX_STANDARD 20) # minimum supported version
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Compile database for clangd (swim/VSCode/vim): real per-target flags
+# (-std=c++20, include paths, defines) land in build/compile_commands.json,
+# which clangd discovers automatically from the build/ subdirectory.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()

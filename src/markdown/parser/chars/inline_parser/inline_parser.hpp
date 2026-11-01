@@ -13,7 +13,7 @@
 #include "markdown/parser/chars/html_tag/html_tag.hpp"
 #include "markdown/parser/chars/link_def/link_def.hpp"
 
-namespace md::detail {
+namespace md {
 
 /// Inline markdown parser: emphasis, code spans, links, images, entities, HTML tags.
 class InlineParser {
@@ -305,4 +305,4 @@ class InlineParser {
     ) const;
 };
 
-} // namespace md::detail
+} // namespace md

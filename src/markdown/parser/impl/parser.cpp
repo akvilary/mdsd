@@ -12,7 +12,7 @@ Document parseMarkdown(const std::string& text) {
     if (replaced) {
         warnings.push_back("invalid UTF-8 sequences replaced: " + std::to_string(replaced));
     }
-    detail::BlockParser parser(warnings);
+    BlockParser parser(warnings);
     Document doc = parser.run(sanitized);
     doc.warnings = std::move(warnings);
     return doc;

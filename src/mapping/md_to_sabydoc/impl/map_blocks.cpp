@@ -10,7 +10,6 @@
 #include "mapping/md_to_sabydoc/mappers.hpp"
 
 namespace mapping {
-namespace detail {
 
 // ---------------------------------------------------------------- dispatcher
 
@@ -99,8 +98,6 @@ void mapBlocks(
     }
 }
 
-} // namespace detail
-
 sd::Document map(
     md::Document doc,
     ResourceCollector& rc,
@@ -114,7 +111,7 @@ sd::Document map(
     out.rootTextLayoutId = makeUuid4();
     out.headerId = makeUuid4();
     std::vector<md::BlockPtr> src = std::move(doc.blocks);
-    detail::mapBlocks(
+    mapBlocks(
         src,
         out.blocks,
         rc,
