@@ -245,8 +245,10 @@ class BlockParser {
     /// Param headerCells: Raw header cell texts.
     /// Param aligns: Column alignments from the delimiter row.
     /// Returns The assembled table block.
-    BlockPtr buildTable(const std::vector<std::string>& headerCells,
-                        const std::vector<Align>& aligns);
+    BlockPtr buildTable(
+        const std::vector<std::string>& headerCells,
+        const std::vector<Align>& aligns
+    );
 
     /// Parses raw cell texts into inline elements.
     /// Param cells: Raw cell texts.
@@ -282,25 +284,19 @@ class BlockParser {
     /// Returns The list block, or nullptr if the line does not start an item.
     BlockPtr tryList(int depth);
 
-    /// Peeks a list item of the given kind at mCursor (blank lines skipped);
-    /// advances mCursor onto the marker line.
+    /// Peeks a list item of the given kind at mCursor; does not advance.
+    /// Blank lines are not skipped: per the list policy a blank line
+    /// terminates the collection, so it fails the peek.
     /// Param ordered: Whether an ordered item is expected.
     /// Returns The item marker, or nullopt.
     std::optional<Marker> peekListItem(bool ordered);
 
-    /// Gathers all lines of one list item (continuations, nested content, blanks).
+    /// Gathers the lines of one list item: only lines indented at least to
+    /// the item content. A blank line or a smaller indent ends the item
+    /// (and the whole list); there is no lazy continuation across it.
     /// Param m: The item marker.
     /// Returns Item lines relative to the content indent, without trailing blanks.
     std::vector<std::string> gatherItem(const Marker& m);
-
-    /// Handles a blank line inside a list item: keeps it if the item continues.
-    /// \param[in,out] item Item lines collected so far.
-    /// Param contentIndent: Content indent of the item.
-    /// Returns true if the blank line was consumed as part of the item.
-    bool handleItemBlank(
-        std::vector<std::string>& item,
-        size_t contentIndent
-    );
 
     /// Turns raw item lines into a ListItem: strips the task prefix, parses children.
     /// Param raw: Item lines.
@@ -336,8 +332,10 @@ class BlockParser {
     /// \param[in,out] collected Paragraph lines collected so far.
     /// Param line: The candidate special line.
     /// Returns The produced block (header/table), or nullptr if the line is ordinary.
-    BlockPtr tryParagraphSpecial(std::vector<std::pair<std::string, bool>>& collected,
-                                 const std::string& line);
+    BlockPtr tryParagraphSpecial(
+        std::vector<std::pair<std::string, bool>>& collected,
+        const std::string& line
+    );
 
     /// A delimiter line turns the previous paragraph line into a table header.
     /// Param headerLine: Line that becomes the header.

@@ -2,14 +2,18 @@
 
 #include "markdown/parser/chars/inline_parser/inline_parser.hpp"
 
+#include <cstddef>
+
 #include "markdown/parser/chars/chars.hpp"
 
 namespace md::detail {
 
-size_t InlineParser::tryEmphasis(const Ctx& c,
-                                 size_t i,
-                                 std::vector<InlineElement>& out,
-                                 std::string& buf) const {
+size_t InlineParser::tryEmphasis(
+    const Ctx& c,
+    size_t i,
+    std::vector<InlineElement>& out,
+    std::string& buf
+) const {
     const auto attempt = [&](std::string_view tok, StyleFlags ns, bool wordRule) -> size_t {
         if (!canOpenEmphasis(c.s, i, tok.size(), wordRule)) {
             return 0;
@@ -93,7 +97,7 @@ bool InlineParser::canOpenEmphasis(
     }
     if (wordRule) {
         const char prev = (i > 0) ? s[i - 1] : '\0';
-        if (prev != '\0' && isWordByte(static_cast<unsigned char>(prev))) {
+        if (prev != '\0' && isWordByte(static_cast<std::byte>(prev))) {
             return false;
         }
     }
@@ -101,10 +105,12 @@ bool InlineParser::canOpenEmphasis(
 }
 
 // Closer: the char before is not a space; for _ and __ the char after is not a letter
-size_t InlineParser::findEmphasisClose(const std::string& s,
-                                       size_t from,
-                                       std::string_view tok,
-                                       bool wordRule) {
+size_t InlineParser::findEmphasisClose(
+    const std::string& s,
+    size_t from,
+    std::string_view tok,
+    bool wordRule
+){
     size_t i = from;
     while (i < s.size()) {
         if (s[i] == '\\') { // an escaped delimiter does not count
@@ -115,7 +121,7 @@ size_t InlineParser::findEmphasisClose(const std::string& s,
             const char prev = (i > 0) ? s[i - 1] : '\0';
             const char next = (i + tok.size() < s.size()) ? s[i + tok.size()] : '\0';
             if (prev != ' ' && prev != '\t' && prev != '\0' &&
-                (!wordRule || next == '\0' || !isWordByte(static_cast<unsigned char>(next)))) {
+                (!wordRule || next == '\0' || !isWordByte(static_cast<std::byte>(next)))) {
                 return i;
             }
         }
@@ -124,10 +130,12 @@ size_t InlineParser::findEmphasisClose(const std::string& s,
     return std::string::npos;
 }
 
-size_t InlineParser::tryAngle(const Ctx& c,
-                              size_t i,
-                              std::vector<InlineElement>& out,
-                              std::string& buf) const {
+size_t InlineParser::tryAngle(
+    const Ctx& c,
+    size_t i,
+    std::vector<InlineElement>& out,
+    std::string& buf
+) const {
     if (size_t u = tryComment(c.s, i); u != 0) {
         return u;
     }
@@ -148,10 +156,12 @@ size_t InlineParser::tryComment(
     return (end == std::string::npos) ? s.size() - i : end + 3 - i;
 }
 
-size_t InlineParser::tryAutolink(const Ctx& c,
-                                 size_t i,
-                                 std::vector<InlineElement>& out,
-                                 std::string& buf) const {
+size_t InlineParser::tryAutolink(
+    const Ctx& c,
+    size_t i,
+    std::vector<InlineElement>& out,
+    std::string& buf
+) const {
     const size_t gt = c.s.find('>', i + 1);
     if (gt == std::string::npos) {
         return 0;
@@ -192,10 +202,12 @@ std::string InlineParser::autolinkUrl(const std::string& inner) {
     return {};
 }
 
-size_t InlineParser::tryHtmlTag(const Ctx& c,
-                                size_t i,
-                                std::vector<InlineElement>& out,
-                                std::string& buf) const {
+size_t InlineParser::tryHtmlTag(
+    const Ctx& c,
+    size_t i,
+    std::vector<InlineElement>& out,
+    std::string& buf
+) const {
     HtmlTag tag;
     if (!matchHtmlTag(c.s, i, tag)) {
         return 0;
@@ -220,11 +232,13 @@ size_t InlineParser::tryHtmlTag(const Ctx& c,
     return tag.end - i;
 }
 
-size_t InlineParser::tryImgTag(const Ctx& c,
-                               size_t i,
-                               const HtmlTag& tag,
-                               std::vector<InlineElement>& out,
-                               std::string& buf) const {
+size_t InlineParser::tryImgTag(
+    const Ctx& c,
+    size_t i,
+    const HtmlTag& tag,
+    std::vector<InlineElement>& out,
+    std::string& buf
+) const {
     const std::string src = attrValue(tag.attrs, "src");
     if (!src.empty()) {
         InlineImage img;
@@ -241,12 +255,14 @@ size_t InlineParser::tryImgTag(const Ctx& c,
     return tag.end - i;
 }
 
-size_t InlineParser::tryStyledTag(const Ctx& c,
-                                  size_t i,
-                                  const HtmlTag& tag,
-                                  int kind,
-                                  std::vector<InlineElement>& out,
-                                  std::string& buf) const {
+size_t InlineParser::tryStyledTag(
+    const Ctx& c,
+    size_t i,
+    const HtmlTag& tag,
+    int kind,
+    std::vector<InlineElement>& out,
+    std::string& buf
+) const {
     const size_t close = findClosingTag(c.s, tag.end, tag.name);
     if (close == std::string::npos) {
         return 0; // unclosed paired tag — the caller will skip (the tag itself)

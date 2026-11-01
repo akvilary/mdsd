@@ -62,8 +62,10 @@ BlockPtr BlockParser::parseParagraph() {
 }
 
 // A setext underline and a GFM table "over" the last paragraph line
-BlockPtr BlockParser::tryParagraphSpecial(std::vector<std::pair<std::string, bool>>& collected,
-                                          const std::string& line) {
+BlockPtr BlockParser::tryParagraphSpecial(
+    std::vector<std::pair<std::string, bool>>& collected,
+    const std::string& line
+){
     if (int level = 0; !collected.empty() && isSetextUnderline(line, level)) {
         ++mCursor;
         auto b = std::make_unique<Block>();
@@ -81,8 +83,10 @@ BlockPtr BlockParser::tryParagraphSpecial(std::vector<std::pair<std::string, boo
 }
 
 // A delimiter line turns the previous paragraph line into a table header
-BlockPtr BlockParser::tableFromDelimiter(const std::string& headerLine,
-                                         const std::string& delimLine) {
+BlockPtr BlockParser::tableFromDelimiter(
+    const std::string& headerLine,
+    const std::string& delimLine
+){
     if (headerLine.find('|') == std::string::npos) {
         return nullptr;
     }
@@ -100,8 +104,10 @@ BlockPtr BlockParser::tableFromDelimiter(const std::string& headerLine,
 
 // A paragraph line: (text, hard-break-after). Two or more trailing spaces mean a
 // hard break, and so does an odd number of trailing backslashes (even = escaped pairs).
-void BlockParser::addParagraphLine(std::vector<std::pair<std::string, bool>>& collected,
-                                   std::string l) {
+void BlockParser::addParagraphLine(
+    std::vector<std::pair<std::string, bool>>& collected,
+    std::string l
+){
     bool hard = false;
     size_t end = l.size();
     while (end > 0 && isSpaceCh(l[end - 1])) {
@@ -133,8 +139,10 @@ size_t BlockParser::trailingBackslashes(const std::string& l) {
     return bs;
 }
 
-std::string BlockParser::joinCollected(const std::vector<std::pair<std::string, bool>>& lines,
-                                       bool useBreaks) {
+std::string BlockParser::joinCollected(
+    const std::vector<std::pair<std::string, bool>>& lines,
+    bool useBreaks
+){
     std::string out;
     for (size_t k = 0; k < lines.size(); ++k) {
         if (k > 0) {

@@ -33,10 +33,12 @@ size_t InlineParser::tryEscape(
     return 0;
 }
 
-size_t InlineParser::tryCodeSpan(const Ctx& c,
-                                 size_t i,
-                                 std::vector<InlineElement>& out,
-                                 std::string& buf) const {
+size_t InlineParser::tryCodeSpan(
+    const Ctx& c,
+    size_t i,
+    std::vector<InlineElement>& out,
+    std::string& buf
+) const {
     const size_t n = countRun(c.s, i, [](char ch) { return ch == '`'; }) - i;
     const size_t close = findCodeSpanClose(c.s, i + n, n);
     if (close == std::string::npos) { // no matching fence of the same length — literal

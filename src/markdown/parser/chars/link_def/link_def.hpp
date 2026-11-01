@@ -45,10 +45,12 @@ size_t matchBracket(
 /// \param[out] title Extracted title (empty if absent).
 /// \param[out] after Position just after the closing ')'.
 /// Returns true if a destination was parsed.
-bool parseDestination(const std::string& s,
-                      size_t openParen,
-                      std::string& url,
-                      std::string& title,
-                      size_t& after);
+bool parseDestination(
+    const std::string& s,
+    size_t openParen,
+    std::string& url,
+    std::string& title,
+    size_t& after
+);
 
 } // namespace md::detail

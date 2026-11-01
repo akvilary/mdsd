@@ -61,11 +61,14 @@ TEST(BlockParser, LazyContinuationGuard) {
     EXPECT_EQ(d.blocks[1]->type, md::Block::Type::Paragraph);
 }
 
-TEST(BlockParser, LazyContinuationAttaches) {
+// No lazy continuation: an under-indented line right after an item is a sibling
+TEST(BlockParser, UnderIndentedLineIsSibling) {
     const md::Document d = parseMd("- item\nпродолжение");
-    ASSERT_EQ(d.blocks.size(), 1u);
-    ASSERT_EQ(d.blocks[0]->items.size(), 1u);
-    EXPECT_EQ(runsDump(d.blocks[0]->items[0].content), "[item продолжение||]");
+    ASSERT_EQ(d.blocks.size(), 2u);
+    EXPECT_EQ(d.blocks[0]->type, md::Block::Type::List);
+    EXPECT_EQ(runsDump(d.blocks[0]->items[0].content), "[item||]");
+    EXPECT_EQ(d.blocks[1]->type, md::Block::Type::Paragraph);
+    EXPECT_EQ(runsDump(d.blocks[1]->inlines), "[продолжение||]");
 }
 
 // >4 spaces after the marker: content keeps the excess (code inside an item)
@@ -87,10 +90,58 @@ TEST(BlockParser, TaskList) {
     EXPECT_EQ(runsDump(d.blocks[0]->items[0].content), "[первый||]"); // task prefix stripped
 }
 
-TEST(BlockParser, LooseListStaysOneList) {
+// A blank line always terminates the collection: two lists, one item each
+TEST(BlockParser, BlankSplitsLists) {
     const md::Document d = parseMd("- a\n\n- b");
-    ASSERT_EQ(d.blocks.size(), 1u);
+    ASSERT_EQ(d.blocks.size(), 2u);
+    EXPECT_EQ(d.blocks[0]->type, md::Block::Type::List);
+    ASSERT_EQ(d.blocks[0]->items.size(), 1u);
+    EXPECT_EQ(runsDump(d.blocks[0]->items[0].content), "[a||]");
+    EXPECT_EQ(d.blocks[1]->type, md::Block::Type::List);
+    EXPECT_EQ(d.blocks[1]->items.size(), 1u);
+    EXPECT_EQ(runsDump(d.blocks[1]->items[0].content), "[b||]");
+}
+
+// The same for ordered lists: a blank line starts a new collection
+TEST(BlockParser, BlankSplitsOrderedLists) {
+    const md::Document d = parseMd("1. первый\n\n2. второй");
+    ASSERT_EQ(d.blocks.size(), 2u);
+    EXPECT_EQ(d.blocks[0]->listKind, md::ListKind::Ordered);
+    EXPECT_EQ(d.blocks[0]->items.size(), 1u);
+    EXPECT_EQ(d.blocks[1]->listKind, md::ListKind::Ordered);
+    EXPECT_EQ(d.blocks[1]->items.size(), 1u);
+}
+
+// A blank line ends lazy continuation: the paragraph after a list is a sibling,
+// not part of the last item (same for tables and other following blocks)
+TEST(BlockParser, ParagraphAfterListIsSibling) {
+    const md::Document d = parseMd("- a\n- b\n\nТекст абзаца.\nЕщё строка.");
+    ASSERT_EQ(d.blocks.size(), 2u);
+    EXPECT_EQ(d.blocks[0]->type, md::Block::Type::List);
     EXPECT_EQ(d.blocks[0]->items.size(), 2u);
+    EXPECT_EQ(runsDump(d.blocks[0]->items[1].content), "[b||]");
+    EXPECT_EQ(d.blocks[1]->type, md::Block::Type::Paragraph);
+    EXPECT_EQ(runsDump(d.blocks[1]->inlines), "[Текст абзаца. Ещё строка.||]");
+}
+
+// ...and the table after a blank line is a sibling block too
+TEST(BlockParser, TableAfterListIsSibling) {
+    const md::Document d = parseMd("- a\n\n| x | y |\n|---|---|\n| 1 | 2 |\n\nАбзац.");
+    ASSERT_EQ(d.blocks.size(), 3u);
+    EXPECT_EQ(d.blocks[0]->type, md::Block::Type::List);
+    EXPECT_EQ(d.blocks[1]->type, md::Block::Type::Table);
+    EXPECT_EQ(d.blocks[2]->type, md::Block::Type::Paragraph);
+}
+
+// A blank line ends the item even when the following text is indented to it
+TEST(BlockParser, IndentedTextAfterBlankIsSibling) {
+    const md::Document d = parseMd("- a\n\n  продолжение\n\nАбзац.");
+    ASSERT_EQ(d.blocks.size(), 3u);
+    EXPECT_EQ(d.blocks[0]->type, md::Block::Type::List);
+    ASSERT_EQ(d.blocks[0]->items.size(), 1u);
+    EXPECT_EQ(d.blocks[1]->type, md::Block::Type::Paragraph);
+    EXPECT_EQ(runsDump(d.blocks[1]->inlines), "[продолжение||]");
+    EXPECT_EQ(d.blocks[2]->type, md::Block::Type::Paragraph);
 }
 
 // per CM, "хвост" lazily continues into the nested quote — a single top-level block

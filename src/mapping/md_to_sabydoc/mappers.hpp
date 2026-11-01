@@ -65,21 +65,25 @@ void dropTrailingEmptyRuns(std::vector<md::InlineElement>& elems);
 /// Param dst: Destination block list.
 /// Param rc: Resource collector used to register images.
 /// Param allowImages: Whether images may be emitted here.
-void mapGroup(const std::vector<md::InlineElement>& group,
-              md::Align align,
-              std::vector<sd::BlockPtr>& dst,
-              ResourceCollector& rc,
-              bool allowImages);
+void mapGroup(
+    const std::vector<md::InlineElement>& group,
+    md::Align align,
+    std::vector<sd::BlockPtr>& dst,
+    ResourceCollector& rc,
+    bool allowImages
+);
 
 /// Maps a markdown paragraph block.
 /// Param b: The markdown paragraph block.
 /// Param dst: Destination block list.
 /// Param rc: Resource collector used to register images.
 /// Param allowImages: Whether images may be emitted here.
-void mapParagraph(const md::Block& b,
-                  std::vector<sd::BlockPtr>& dst,
-                  ResourceCollector& rc,
-                  bool allowImages);
+void mapParagraph(
+    const md::Block& b,
+    std::vector<sd::BlockPtr>& dst,
+    ResourceCollector& rc,
+    bool allowImages
+);
 
 /// Flattens nested quote blocks into a single-level block list.
 /// Param src: Source markdown blocks.
@@ -107,11 +111,13 @@ void mapHeader(
 /// Param rc: Resource collector used to register images.
 /// Param topLevel: Whether the block sits at the document top level.
 /// Param depth: Current container nesting depth.
-void mapSingleBlock(md::BlockPtr& b,
-                    std::vector<sd::BlockPtr>& dst,
-                    ResourceCollector& rc,
-                    bool topLevel,
-                    int depth);
+void mapSingleBlock(
+    md::BlockPtr& b,
+    std::vector<sd::BlockPtr>& dst,
+    ResourceCollector& rc,
+    bool topLevel,
+    int depth
+);
 
 /// Maps a list of markdown blocks.
 /// Param src: Source markdown blocks.
@@ -119,11 +125,13 @@ void mapSingleBlock(md::BlockPtr& b,
 /// Param rc: Resource collector used to register images.
 /// Param topLevel: Whether the blocks sit at the document top level.
 /// Param depth: Current container nesting depth.
-void mapBlocks(std::vector<md::BlockPtr>& src,
-               std::vector<sd::BlockPtr>& dst,
-               ResourceCollector& rc,
-               bool topLevel,
-               int depth);
+void mapBlocks(
+    std::vector<md::BlockPtr>& src,
+    std::vector<sd::BlockPtr>& dst,
+    ResourceCollector& rc,
+    bool topLevel,
+    int depth
+);
 
 // --- impl/map_containers.cpp: lists and tables ---
 

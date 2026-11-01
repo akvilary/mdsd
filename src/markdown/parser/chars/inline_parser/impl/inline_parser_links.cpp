@@ -2,6 +2,8 @@
 
 #include "markdown/parser/chars/inline_parser/inline_parser.hpp"
 
+#include <cstddef>
+
 #include "markdown/parser/chars/chars.hpp"
 
 namespace md::detail {
@@ -16,12 +18,14 @@ bool InlineParser::lookupDef(const std::string& rawLabel, LinkDef& out) const {
 }
 
 // Link target: (destination) / [ref] / [ref][] / collapsed [ref]. false — not a link.
-bool InlineParser::resolveTarget(const std::string& s,
-                                 size_t close,
-                                 const std::string& inner,
-                                 std::string& url,
-                                 std::string& title,
-                                 size_t& after) const {
+bool InlineParser::resolveTarget(
+    const std::string& s,
+    size_t close,
+    const std::string& inner,
+    std::string& url,
+    std::string& title,
+    size_t& after
+) const {
     if (close + 1 < s.size() && s[close + 1] == '(' &&
         parseDestination(
             s,
@@ -54,10 +58,12 @@ bool InlineParser::resolveTarget(const std::string& s,
     return true;
 }
 
-size_t InlineParser::tryImage(const Ctx& c,
-                              size_t i,
-                              std::vector<InlineElement>& out,
-                              std::string& buf) const {
+size_t InlineParser::tryImage(
+    const Ctx& c,
+    size_t i,
+    std::vector<InlineElement>& out,
+    std::string& buf
+) const {
     const size_t close = matchBracket(c.s, i + 1);
     if (close == std::string::npos) {
         return 0;
@@ -81,10 +87,12 @@ size_t InlineParser::tryImage(const Ctx& c,
     return after - i;
 }
 
-size_t InlineParser::tryLink(const Ctx& c,
-                             size_t i,
-                             std::vector<InlineElement>& out,
-                             std::string& buf) const {
+size_t InlineParser::tryLink(
+    const Ctx& c,
+    size_t i,
+    std::vector<InlineElement>& out,
+    std::string& buf
+) const {
     const size_t close = matchBracket(c.s, i);
     if (close == std::string::npos) {
         return 0;
@@ -110,10 +118,12 @@ size_t InlineParser::tryLink(const Ctx& c,
     return after - i;
 }
 
-size_t InlineParser::tryBareUrl(const Ctx& c,
-                                size_t i,
-                                std::vector<InlineElement>& out,
-                                std::string& buf) const {
+size_t InlineParser::tryBareUrl(
+    const Ctx& c,
+    size_t i,
+    std::vector<InlineElement>& out,
+    std::string& buf
+) const {
     const std::string_view rest(
         c.s.data() + i,
         c.s.size() - i
@@ -123,7 +133,7 @@ size_t InlineParser::tryBareUrl(const Ctx& c,
     }
     const char prev = (i > 0) ? c.s[i - 1] : '\0';
     if (prev != '\0' &&
-        isWordByte(static_cast<unsigned char>(prev))) { // not in the middle of a word
+        isWordByte(static_cast<std::byte>(prev))) { // not in the middle of a word
         return 0;
     }
     size_t end = i;

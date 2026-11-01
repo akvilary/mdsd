@@ -22,8 +22,10 @@ BlockPtr BlockParser::tryTableStart() {
     return buildTable(header, *aligns);
 }
 
-BlockPtr BlockParser::buildTable(const std::vector<std::string>& headerCells,
-                                 const std::vector<Align>& aligns) {
+BlockPtr BlockParser::buildTable(
+    const std::vector<std::string>& headerCells,
+    const std::vector<Align>& aligns
+){
     auto b = std::make_unique<Block>();
     b->type = Block::Type::Table;
     b->colAlign = aligns;

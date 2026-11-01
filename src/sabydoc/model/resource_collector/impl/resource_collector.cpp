@@ -1,7 +1,9 @@
 #include "sabydoc/model/resource_collector/resource_collector.hpp"
 
+#include <cstddef>
 #include <fstream>
 #include <functional>
+#include <span>
 
 #include "image_size/image_size.hpp"
 #include "uuid4/uuid4.hpp"
@@ -15,8 +17,8 @@ bool isRemote(const std::string& url) {
 
 std::string fnv1a8(const std::string& s) {
     uint64_t h = 1469598103934665603ull;
-    for (unsigned char c : s) {
-        h ^= c;
+    for (std::byte b : std::as_bytes(std::span(s))) {
+        h ^= std::to_integer<uint64_t>(b);
         h *= 1099511628211ull;
     }
     char buf[16];
@@ -33,7 +35,7 @@ bool asciiSafeName(const std::string& s) {
     if (s.empty() || s.size() > 128) {
         return false;
     }
-    for (unsigned char c : s) {
+    for (char c : s) {
         if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ||
               c == '.' || c == '_' || c == '-')) {
             return false;
@@ -79,8 +81,10 @@ std::string readFileBytes(
 
 } // namespace
 
-ResourceCollector::ResourceCollector(std::filesystem::path baseDir,
-                                     std::vector<std::string>& diagnostics)
+ResourceCollector::ResourceCollector(
+    std::filesystem::path baseDir,
+    std::vector<std::string>& diagnostics
+)
     : mBaseDir(std::move(baseDir)), mDiagnostics(diagnostics) {}
 
 std::string ResourceCollector::addImage(

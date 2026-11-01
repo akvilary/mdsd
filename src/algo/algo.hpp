@@ -1,6 +1,8 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
+#include <cstddef>
 #include <initializer_list>
 #include <ranges>
 #include <string_view>
@@ -30,6 +32,33 @@ constexpr bool startsWithAny(
     std::initializer_list<std::string_view> prefixes
 ){
     return std::ranges::any_of(prefixes, [&](std::string_view p) { return s.starts_with(p); });
+}
+
+/// Converts a string literal into a fixed-size byte sequence at compile time.
+/// Lets binary magic values be spelled as readable strings:
+/// toBytes("\x89PNG\r\n\x1A\n") instead of {std::byte{0x89}, std::byte{'P'}, ...}.
+/// Param s: The literal to convert; the terminating '\0' is dropped.
+/// Returns The literal's bytes as a compile-time array.
+template <size_t N>
+constexpr std::array<std::byte, N - 1> toBytes(const char (&s)[N]) {
+    std::array<std::byte, N - 1> out{};
+    for (size_t i = 0; i + 1 < N; ++i) {
+        out[i] = static_cast<std::byte>(s[i]);
+    }
+    return out;
+}
+
+/// Checks whether the buffer at p begins with the signature sig.
+/// The caller must guarantee that at least sig.size() bytes are readable at p.
+/// Param p: The buffer to test.
+/// Param sig: The expected byte sequence.
+/// Returns true if the first sig.size() bytes at p equal sig.
+template <size_t M>
+constexpr bool startsWith(
+    const std::byte* p,
+    const std::array<std::byte, M>& sig
+){
+    return std::equal(sig.begin(), sig.end(), p);
 }
 
 } // namespace ut

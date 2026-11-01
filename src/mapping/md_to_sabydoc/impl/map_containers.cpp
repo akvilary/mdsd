@@ -8,11 +8,13 @@ namespace detail {
 
 // ---------------------------------------------------------------- lists
 
-void mapBlocks(std::vector<md::BlockPtr>& src,
-               std::vector<sd::BlockPtr>& dst,
-               ResourceCollector& rc,
-               bool topLevel,
-               int depth);
+void mapBlocks(
+    std::vector<md::BlockPtr>& src,
+    std::vector<sd::BlockPtr>& dst,
+    ResourceCollector& rc,
+    bool topLevel,
+    int depth
+);
 
 sd::ListItem mapListItem(
     md::ListItem& item,

@@ -100,11 +100,13 @@ void dropTrailingEmptyRuns(std::vector<md::InlineElement>& elems) {
     }
 }
 
-void mapGroup(const std::vector<md::InlineElement>& group,
-              md::Align align,
-              std::vector<sd::BlockPtr>& dst,
-              ResourceCollector& rc,
-              bool allowImages) {
+void mapGroup(
+    const std::vector<md::InlineElement>& group,
+    md::Align align,
+    std::vector<sd::BlockPtr>& dst,
+    ResourceCollector& rc,
+    bool allowImages
+){
     std::vector<md::InlineElement> cur;
     auto flushCur = [&] {
         dropTrailingEmptyRuns(cur);
@@ -141,10 +143,12 @@ void mapGroup(const std::vector<md::InlineElement>& group,
     flushCur();
 }
 
-void mapParagraph(const md::Block& b,
-                  std::vector<sd::BlockPtr>& dst,
-                  ResourceCollector& rc,
-                  bool allowImages) {
+void mapParagraph(
+    const md::Block& b,
+    std::vector<sd::BlockPtr>& dst,
+    ResourceCollector& rc,
+    bool allowImages
+){
     for (const auto& group :
          md::splitByLineBreaks(b.inlines)) { // hard line breaks -> new paragraphs
         mapGroup(

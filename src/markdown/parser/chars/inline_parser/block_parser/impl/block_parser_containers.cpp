@@ -1,4 +1,6 @@
-// Block parser: quotes and lists (including the lazy-continuation guard).
+// Block parser: quotes and lists.
+// List policy: an item continues while lines are indented to its content;
+// a blank line or a smaller indent ends the item and the whole list.
 
 #include "markdown/parser/chars/inline_parser/block_parser/block_parser.hpp"
 
@@ -91,11 +93,9 @@ BlockPtr BlockParser::tryList(int depth) {
     return b;
 }
 
-// An item of the current kind at mCursor (blank lines skipped); advances mCursor onto the marker.
+// An item of the current kind at mCursor; blank lines are not skipped —
+// per the list policy a blank line terminates the collection.
 std::optional<Marker> BlockParser::peekListItem(bool ordered) {
-    while (mCursor < mLines.size() && isBlank(mLines[mCursor])) {
-        ++mCursor;
-    }
     if (mCursor >= mLines.size()) {
         return std::nullopt;
     }
@@ -109,57 +109,27 @@ std::optional<Marker> BlockParser::peekListItem(bool ordered) {
 std::vector<std::string> BlockParser::gatherItem(const Marker& m) {
     std::vector<std::string> item;
     item.push_back(m.rest);
-    bool lastWasText = !trim(m.rest).empty();
     while (mCursor < mLines.size()) {
-        if (handleItemBlank(item, m.contentIndent)) {
-            lastWasText = false;
-            continue;
-        }
         const std::string& ln = mLines[mCursor];
-        if (indentOf(ln) >= m.contentIndent) {
-            item.push_back(ln.substr(m.contentIndent));
-            lastWasText = !isBlockStarter(ln);
-            ++mCursor;
-            continue;
-        }
-        if (isBlockStarter(ln)) {
+        // Continuation: only lines indented at least to the item content.
+        // A blank line or a smaller indent ends the item and the list.
+        if (isBlank(ln) || indentOf(ln) < m.contentIndent) {
             break;
         }
-        if (lastWasText) { // lazy-continuation guard
-            item.push_back(rtrimCopy(ln));
-            ++mCursor;
-            continue;
-        }
-        break;
+        item.push_back(ln.substr(m.contentIndent));
+        ++mCursor;
     }
-    while (!item.empty() && isBlank(item.back())) {
+    while (!item.empty() && isBlank(item.back())) { // a bare "-" marker
         item.pop_back();
     }
     return item;
 }
 
-bool BlockParser::handleItemBlank(
-    std::vector<std::string>& item,
-    size_t contentIndent
+bool BlockParser::makeListItem(
+    std::vector<std::string> raw,
+    std::vector<ListItem>& out,
+    int depth
 ){
-    if (!isBlank(mLines[mCursor])) {
-        return false;
-    }
-    size_t k = mCursor;
-    while (k < mLines.size() && isBlank(mLines[k])) {
-        ++k;
-    }
-    if (k < mLines.size() && indentOf(mLines[k]) >= contentIndent) {
-        item.push_back("");
-        ++mCursor;
-        return true;
-    }
-    return false;
-}
-
-bool BlockParser::makeListItem(std::vector<std::string> raw,
-                               std::vector<ListItem>& out,
-                               int depth) {
     ListItem item;
     stripTaskPrefix(
         raw,

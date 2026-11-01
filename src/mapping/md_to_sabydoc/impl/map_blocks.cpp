@@ -14,11 +14,13 @@ namespace detail {
 
 // ---------------------------------------------------------------- dispatcher
 
-void mapSingleBlock(md::BlockPtr& b,
-                    std::vector<sd::BlockPtr>& dst,
-                    ResourceCollector& rc,
-                    bool topLevel,
-                    int depth) {
+void mapSingleBlock(
+    md::BlockPtr& b,
+    std::vector<sd::BlockPtr>& dst,
+    ResourceCollector& rc,
+    bool topLevel,
+    int depth
+){
     switch (b->type) {
     case md::Block::Type::Paragraph:
         mapParagraph(
@@ -72,11 +74,13 @@ void mapSingleBlock(md::BlockPtr& b,
     }
 }
 
-void mapBlocks(std::vector<md::BlockPtr>& src,
-               std::vector<sd::BlockPtr>& dst,
-               ResourceCollector& rc,
-               bool topLevel,
-               int depth) {
+void mapBlocks(
+    std::vector<md::BlockPtr>& src,
+    std::vector<sd::BlockPtr>& dst,
+    ResourceCollector& rc,
+    bool topLevel,
+    int depth
+){
     if (depth > kMaxDepth) {
         return;
     }

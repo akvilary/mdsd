@@ -1,6 +1,7 @@
 #include "markdown/parser/chars/html_tag/html_tag.hpp"
 
 #include <cctype>
+#include <cstddef>
 
 #include "algo/algo.hpp"
 #include "markdown/parser/chars/chars.hpp"
@@ -96,7 +97,7 @@ std::string attrValue(
         // name boundary: "data-align"/"data-src" must not match as align/src
         const char prev = (p > 0) ? attrs[p - 1] : '\0';
         const bool boundary =
-            prev == '\0' || (!isWordByte(static_cast<unsigned char>(prev)) && prev != '-');
+            prev == '\0' || (!isWordByte(static_cast<std::byte>(prev)) && prev != '-');
         if (boundary) {
             return readAttrValue(attrs, p + pat.size());
         }

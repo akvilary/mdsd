@@ -151,11 +151,13 @@ size_t findCloseParen(
 
 } // namespace
 
-bool parseDestination(const std::string& s,
-                      size_t openParen,
-                      std::string& url,
-                      std::string& title,
-                      size_t& after) {
+bool parseDestination(
+    const std::string& s,
+    size_t openParen,
+    std::string& url,
+    std::string& title,
+    size_t& after
+){
     if (openParen >= s.size() || s[openParen] != '(') {
         return false;
     }

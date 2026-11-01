@@ -1,6 +1,7 @@
 #include "zip_writer/zip_writer.hpp"
 
 #include <array>
+#include <cstddef>
 #include <ctime>
 #include <stdexcept>
 
@@ -68,10 +69,10 @@ uint32_t crc32(
     const void* data,
     size_t size
 ){
-    const auto* p = static_cast<const unsigned char*>(data);
+    const auto* p = static_cast<const std::byte*>(data);
     uint32_t crc = 0xFFFFFFFFu;
     for (size_t i = 0; i < size; ++i) {
-        crc = kCrcTable[(crc ^ p[i]) & 0xFF] ^ (crc >> 8);
+        crc = kCrcTable[(crc ^ std::to_integer<uint32_t>(p[i])) & 0xFF] ^ (crc >> 8);
     }
     return crc ^ 0xFFFFFFFFu;
 }

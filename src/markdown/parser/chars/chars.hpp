@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstddef>
 #include <ranges>
 #include <string>
 #include <string_view>
@@ -25,7 +26,9 @@ constexpr bool isDigit(char c) { return c >= '0' && c <= '9'; }
 /// Checks whether the byte belongs to a word: alnum or non-ASCII (UTF-8).
 /// Param c: Byte to check.
 /// Returns true if the byte is alphanumeric or >= 0x80.
-constexpr bool isWordByte(unsigned char c) { return std::isalnum(c) != 0 || c >= 0x80; }
+constexpr bool isWordByte(std::byte c) {
+    return std::isalnum(std::to_integer<int>(c)) != 0 || c >= std::byte{0x80};
+}
 
 /// Checks whether the character is an ASCII punctuation character.
 /// Param c: Character to check.

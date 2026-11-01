@@ -1,31 +1,40 @@
 #include "image_size/image_size.hpp"
 
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 
+#include "algo/algo.hpp"
+
 namespace {
 
-uint32_t rdBE32(const unsigned char* p) {
-    return (static_cast<uint32_t>(p[0]) << 24) | (static_cast<uint32_t>(p[1]) << 16) |
-           (static_cast<uint32_t>(p[2]) << 8) | p[3];
+// Binary format signatures, spelled as string literals for readability.
+constexpr auto kPngSig = ut::toBytes("\x89PNG\r\n\x1A\n"); // PNG file signature
+constexpr auto kJpegSoi = ut::toBytes("\xFF\xD8");         // JPEG start-of-image marker
+constexpr auto kVp8Magic = ut::toBytes("\x9D\x01\x2A");    // VP8 keyframe magic
+
+uint32_t rdBE32(const std::byte* p) {
+    return (std::to_integer<uint32_t>(p[0]) << 24) | (std::to_integer<uint32_t>(p[1]) << 16) |
+           (std::to_integer<uint32_t>(p[2]) << 8) | std::to_integer<uint32_t>(p[3]);
 }
 
-uint32_t rdLE32(const unsigned char* p) {
-    return static_cast<uint32_t>(p[0]) | (static_cast<uint32_t>(p[1]) << 8) |
-           (static_cast<uint32_t>(p[2]) << 16) | (static_cast<uint32_t>(p[3]) << 24);
+uint32_t rdLE32(const std::byte* p) {
+    return std::to_integer<uint32_t>(p[0]) | (std::to_integer<uint32_t>(p[1]) << 8) |
+           (std::to_integer<uint32_t>(p[2]) << 16) | (std::to_integer<uint32_t>(p[3]) << 24);
 }
 
-uint32_t rdLE24(const unsigned char* p) {
-    return static_cast<uint32_t>(p[0]) | (static_cast<uint32_t>(p[1]) << 8) |
-           (static_cast<uint32_t>(p[2]) << 16);
+uint32_t rdLE24(const std::byte* p) {
+    return std::to_integer<uint32_t>(p[0]) | (std::to_integer<uint32_t>(p[1]) << 8) |
+           (std::to_integer<uint32_t>(p[2]) << 16);
 }
 
 ImageSize probePng(
-    const unsigned char* p,
+    const std::byte* p,
     size_t n
 ){
-    static const unsigned char sig[] = {0x89, 'P', 'N', 'G', '\r', '\n', 0x1A, '\n'};
-    if (n < 33 || std::memcmp(p, sig, 8) != 0 || std::memcmp(p + 12, "IHDR", 4) != 0) {
+    // 8-byte signature, then chunk length and the "IHDR" header type.
+    if (n < 33 || !ut::startsWith(p, kPngSig) ||
+        !ut::startsWith(p + 12, ut::toBytes("IHDR"))) {
         return {};
     }
     ImageSize s;
@@ -36,24 +45,24 @@ ImageSize probePng(
 }
 
 ImageSize probeGif(
-    const unsigned char* p,
+    const std::byte* p,
     size_t n
 ){
-    if (n < 10 || std::memcmp(p, "GIF8", 4) != 0) {
+    if (n < 10 || !ut::startsWith(p, ut::toBytes("GIF8"))) {
         return {};
     }
     ImageSize s;
-    s.width = p[6] | (p[7] << 8);
-    s.height = p[8] | (p[9] << 8);
+    s.width = std::to_integer<unsigned>(p[6]) | (std::to_integer<unsigned>(p[7]) << 8);
+    s.height = std::to_integer<unsigned>(p[8]) | (std::to_integer<unsigned>(p[9]) << 8);
     s.ok = s.width > 0 && s.height > 0;
     return s;
 }
 
 ImageSize probeBmp(
-    const unsigned char* p,
+    const std::byte* p,
     size_t n
 ){
-    if (n < 26 || p[0] != 'B' || p[1] != 'M') {
+    if (n < 26 || !ut::startsWith(p, ut::toBytes("BM"))) {
         return {};
     }
     int32_t w, h;
@@ -75,19 +84,19 @@ ImageSize probeBmp(
 }
 
 ImageSize probeJpeg(
-    const unsigned char* p,
+    const std::byte* p,
     size_t n
 ){
-    if (n < 4 || p[0] != 0xFF || p[1] != 0xD8) {
+    if (n < 4 || !ut::startsWith(p, kJpegSoi)) {
         return {};
     }
     size_t i = 2;
     while (i + 4 < n) {
-        if (p[i] != 0xFF) {
+        if (p[i] != std::byte{0xFF}) {
             ++i;
             continue;
         }
-        const uint8_t marker = p[i + 1];
+        const uint8_t marker = std::to_integer<uint8_t>(p[i + 1]);
         if (marker == 0xD8 || marker == 0x01 || (marker >= 0xD0 && marker <= 0xD7)) {
             i += 2;
             continue;
@@ -95,13 +104,16 @@ ImageSize probeJpeg(
         if (i + 4 > n) {
             break;
         }
-        const uint32_t segLen = (static_cast<uint32_t>(p[i + 2]) << 8) | p[i + 3];
+        const uint32_t segLen = (std::to_integer<uint32_t>(p[i + 2]) << 8) |
+                                std::to_integer<uint32_t>(p[i + 3]);
         const bool isSof = (marker >= 0xC0 && marker <= 0xCF) && marker != 0xC4 && marker != 0xC8 &&
                            marker != 0xCC;
         if (isSof && i + 9 <= n) {
             ImageSize s;
-            s.height = (static_cast<unsigned>(p[i + 5]) << 8) | p[i + 6];
-            s.width = (static_cast<unsigned>(p[i + 7]) << 8) | p[i + 8];
+            s.height = (std::to_integer<unsigned>(p[i + 5]) << 8) |
+                       std::to_integer<unsigned>(p[i + 6]);
+            s.width = (std::to_integer<unsigned>(p[i + 7]) << 8) |
+                      std::to_integer<unsigned>(p[i + 8]);
             s.ok = s.width > 0 && s.height > 0;
             return s;
         }
@@ -117,40 +129,44 @@ ImageSize probeJpeg(
 }
 
 ImageSize probeWebp(
-    const unsigned char* p,
+    const std::byte* p,
     size_t n
 ){
-    if (n < 30 || std::memcmp(p, "RIFF", 4) != 0 || std::memcmp(p + 8, "WEBP", 4) != 0) {
+    if (n < 30 || !ut::startsWith(p, ut::toBytes("RIFF")) ||
+        !ut::startsWith(p + 8, ut::toBytes("WEBP"))) {
         return {};
     }
     size_t i = 12;
     while (i + 8 <= n) {
-        char fourcc[4];
+        std::byte fourcc[4];
         std::memcpy(
             fourcc,
             p + i,
             4
         );
         const uint32_t size = rdLE32(p + i + 4);
-        const unsigned char* payload = p + i + 8;
+        const std::byte* payload = p + i + 8;
         const size_t avail = n - (i + 8);
-        if (std::memcmp(fourcc, "VP8X", 4) == 0 && avail >= 10) {
+        if (ut::startsWith(fourcc, ut::toBytes("VP8X")) && avail >= 10) { // extended format
             ImageSize s;
             s.width = rdLE24(payload + 4) + 1;
             s.height = rdLE24(payload + 7) + 1;
             s.ok = true;
             return s;
         }
-        if (std::memcmp(fourcc, "VP8 ", 4) == 0 && avail >= 10) {
-            if (payload[3] == 0x9D && payload[4] == 0x01 && payload[5] == 0x2A) {
+        if (ut::startsWith(fourcc, ut::toBytes("VP8 ")) && avail >= 10) { // lossy
+            if (ut::startsWith(payload + 3, kVp8Magic)) {
                 ImageSize s;
-                s.width = payload[6] | ((payload[7] & 0x3F) << 8);
-                s.height = payload[8] | ((payload[9] & 0x3F) << 8);
+                s.width = std::to_integer<unsigned>(payload[6]) |
+                          ((std::to_integer<unsigned>(payload[7]) & 0x3F) << 8);
+                s.height = std::to_integer<unsigned>(payload[8]) |
+                           ((std::to_integer<unsigned>(payload[9]) & 0x3F) << 8);
                 s.ok = s.width > 0 && s.height > 0;
                 return s;
             }
         }
-        if (std::memcmp(fourcc, "VP8L", 4) == 0 && avail >= 5 && payload[0] == 0x2F) {
+        if (ut::startsWith(fourcc, ut::toBytes("VP8L")) && avail >= 5 &&
+            payload[0] == std::byte{0x2F}) { // lossless
             const uint32_t bits = rdLE32(payload + 1);
             ImageSize s;
             s.width = (bits & 0x3FFFu) + 1;
@@ -166,7 +182,7 @@ ImageSize probeWebp(
 } // namespace
 
 ImageSize probeImageSize(const std::string& bytes) {
-    const auto* p = reinterpret_cast<const unsigned char*>(bytes.data());
+    const auto* p = reinterpret_cast<const std::byte*>(bytes.data());
     const size_t n = bytes.size();
     if (n < 8) {
         return {};

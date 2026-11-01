@@ -116,10 +116,12 @@ class InlineParser {
     /// Param buf: Plain-text buffer, flushed first.
     /// Param kids: Parsed child elements to append.
     template <typename Elem>
-    void emitAll(const Ctx& c,
-                 std::vector<InlineElement>& out,
-                 std::string& buf,
-                 std::vector<Elem> kids) const {
+    void emitAll(
+        const Ctx& c,
+        std::vector<InlineElement>& out,
+        std::string& buf,
+        std::vector<Elem> kids
+    ) const {
         emitRun(
             c,
             out,
@@ -145,12 +147,14 @@ class InlineParser {
     /// \param[out] title Resolved title.
     /// \param[out] after Position just after the consumed target.
     /// Returns true if the target resolves; false means "not a link".
-    bool resolveTarget(const std::string& s,
-                       size_t close,
-                       const std::string& inner,
-                       std::string& url,
-                       std::string& title,
-                       size_t& after) const;
+    bool resolveTarget(
+        const std::string& s,
+        size_t close,
+        const std::string& inner,
+        std::string& url,
+        std::string& title,
+        size_t& after
+    ) const;
 
     /// Tries to parse an image "![alt](url)" at position i.
     /// Param c: Current traversal context.
@@ -275,11 +279,13 @@ class InlineParser {
     /// Param out: Output element list (receives the image).
     /// Param buf: Plain-text buffer, flushed first.
     /// Returns Number of characters consumed (always the whole tag).
-    size_t tryImgTag(const Ctx& c,
-                     size_t i,
-                     const HtmlTag& tag,
-                     std::vector<InlineElement>& out,
-                     std::string& buf) const;
+    size_t tryImgTag(
+        const Ctx& c,
+        size_t i,
+        const HtmlTag& tag,
+        std::vector<InlineElement>& out,
+        std::string& buf
+    ) const;
 
     /// Handles a paired style tag (b/i/u/s/code/a): parses and emits its content.
     /// Param c: Current traversal context.
@@ -289,12 +295,14 @@ class InlineParser {
     /// Param out: Output element list (receives the styled runs).
     /// Param buf: Plain-text buffer, flushed first.
     /// Returns Number of characters consumed, or 0 if the tag is unclosed.
-    size_t tryStyledTag(const Ctx& c,
-                        size_t i,
-                        const HtmlTag& tag,
-                        int kind,
-                        std::vector<InlineElement>& out,
-                        std::string& buf) const;
+    size_t tryStyledTag(
+        const Ctx& c,
+        size_t i,
+        const HtmlTag& tag,
+        int kind,
+        std::vector<InlineElement>& out,
+        std::string& buf
+    ) const;
 };
 
 } // namespace md::detail
