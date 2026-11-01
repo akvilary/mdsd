@@ -11,6 +11,15 @@
 
 namespace md::detail {
 
+namespace {
+
+/// Checks whether a list item starts with a task prefix: "[ ] ", "[x] ", "[X] ".
+bool hasTaskPrefix(const std::string& s) {
+    return ut::startsWithAny(s, {"[ ] ", "[ ]\t", "[x] ", "[X] ", "[x]\t", "[X]\t"});
+}
+
+} // namespace
+
 BlockPtr BlockParser::tryQuote(int depth) {
     if (!isQuoteStart(mLines[mCursor])) {
         return nullptr;
@@ -82,14 +91,19 @@ BlockPtr BlockParser::tryList(int depth) {
     if (!m.ok) {
         return nullptr;
     }
+    // One list = one run of items of the same kind (checkbox or plain).
+    // A kind change ends the list; the block loop starts a new one.
+    const bool taskRun = hasTaskPrefix(m.rest);
     auto b = std::make_unique<Block>();
     b->type = Block::Type::List;
-    bool anyTask = false;
     while (const auto item = peekListItem(m.ordered)) {
+        if (hasTaskPrefix(item->rest) != taskRun) {
+            break; // a different kind starts its own list
+        }
         ++mCursor;
-        anyTask = makeListItem(gatherItem(*item), b->items, depth) || anyTask;
+        makeListItem(gatherItem(*item), b->items, depth);
     }
-    b->listKind = anyTask ? ListKind::Task : (m.ordered ? ListKind::Ordered : ListKind::Bullet);
+    b->listKind = taskRun ? ListKind::Task : (m.ordered ? ListKind::Ordered : ListKind::Bullet);
     return b;
 }
 
@@ -125,7 +139,7 @@ std::vector<std::string> BlockParser::gatherItem(const Marker& m) {
     return item;
 }
 
-bool BlockParser::makeListItem(
+void BlockParser::makeListItem(
     std::vector<std::string> raw,
     std::vector<ListItem>& out,
     int depth
@@ -141,27 +155,19 @@ bool BlockParser::makeListItem(
         sub.erase(sub.begin());
     }
     item.children = std::move(sub);
-    const bool task = item.task;
     out.push_back(std::move(item));
-    return task;
 }
 
 void BlockParser::stripTaskPrefix(
     std::vector<std::string>& raw,
     ListItem& item
 ){
-    if (raw.empty()) {
+    if (raw.empty() || !hasTaskPrefix(raw[0])) {
         return;
     }
-    std::string& first = raw[0];
-    if (ut::startsWithAny(first, {"[ ] ", "[ ]\t"})) {
-        item.task = true;
-        first = first.substr(4);
-    } else if (ut::startsWithAny(first, {"[x] ", "[X] ", "[x]\t", "[X]\t"})) {
-        item.task = true;
-        item.checked = true;
-        first = first.substr(4);
-    }
+    item.task = true;
+    item.checked = raw[0][1] != ' ';
+    raw[0] = raw[0].substr(4);
 }
 
 } // namespace md::detail

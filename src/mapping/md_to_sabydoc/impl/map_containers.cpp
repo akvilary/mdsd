@@ -40,21 +40,16 @@ sd::ListItem mapListItem(
     return out;
 }
 
-sd::ListMarker listMarkerOf(
-    md::ListKind kind,
-    bool anyTask
-){
-    if (anyTask) {
-        return sd::ListMarker::Checkbox;
-    }
+sd::ListMarker listMarkerOf(md::ListKind kind) {
     switch (kind) {
     case md::ListKind::Ordered:
         return sd::ListMarker::Numbered;
-    case md::ListKind::Bullet:
     case md::ListKind::Task:
-    default:
+        return sd::ListMarker::Checkbox;
+    case md::ListKind::Bullet:
         return sd::ListMarker::Bullet;
     }
+    return sd::ListMarker::Bullet;
 }
 
 void mapList(
@@ -64,12 +59,10 @@ void mapList(
     int depth
 ){
     auto lst = newBlock(sd::Block::Kind::List);
-    bool anyTask = false;
     for (md::ListItem& item : b.items) {
-        anyTask = item.task || anyTask;
         lst->items.push_back(mapListItem(item, rc, depth));
     }
-    lst->marker = listMarkerOf(b.listKind, anyTask);
+    lst->marker = listMarkerOf(b.listKind);
     dst.push_back(std::move(lst));
 }
 

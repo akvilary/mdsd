@@ -90,6 +90,20 @@ TEST(BlockParser, TaskList) {
     EXPECT_EQ(runsDump(d.blocks[0]->items[0].content), "[первый||]"); // task prefix stripped
 }
 
+// Mixed items split into lists by kind: runs of checkboxes and plain items
+TEST(BlockParser, MixedTasksSplitIntoKindRuns) {
+    const md::Document d = parseMd("- [ ] a\n- plain\n- [x] c");
+    ASSERT_EQ(d.blocks.size(), 3u);
+    EXPECT_EQ(d.blocks[0]->listKind, md::ListKind::Task);
+    ASSERT_EQ(d.blocks[0]->items.size(), 1u);
+    EXPECT_EQ(runsDump(d.blocks[0]->items[0].content), "[a||]");
+    EXPECT_EQ(d.blocks[1]->listKind, md::ListKind::Bullet);
+    ASSERT_EQ(d.blocks[1]->items.size(), 1u);
+    EXPECT_FALSE(d.blocks[1]->items[0].task);
+    EXPECT_EQ(d.blocks[2]->listKind, md::ListKind::Task);
+    EXPECT_TRUE(d.blocks[2]->items[0].checked);
+}
+
 // A blank line always terminates the collection: two lists, one item each
 TEST(BlockParser, BlankSplitsLists) {
     const md::Document d = parseMd("- a\n\n- b");

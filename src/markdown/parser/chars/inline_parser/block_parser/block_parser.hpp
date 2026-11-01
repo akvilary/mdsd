@@ -279,7 +279,8 @@ class BlockParser {
     /// Returns true if the line can start a block (header, fence, list, wrapper, ...).
     bool isBlockStarter(const std::string& line) const;
 
-    /// Tries to parse a whole list (all consecutive items) at mCursor.
+    /// Tries to parse a list at mCursor: one run of consecutive items of the
+    /// same kind (checkbox or plain); a kind change starts a new list block.
     /// Param depth: Current nesting depth.
     /// Returns The list block, or nullptr if the line does not start an item.
     BlockPtr tryList(int depth);
@@ -302,8 +303,7 @@ class BlockParser {
     /// Param raw: Item lines.
     /// \param[out] out Destination list of items.
     /// Param depth: Current nesting depth.
-    /// Returns true if the item turned out to be a task item.
-    bool makeListItem(
+    void makeListItem(
         std::vector<std::string> raw,
         std::vector<ListItem>& out,
         int depth

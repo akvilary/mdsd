@@ -147,13 +147,9 @@ sd::ListItem mapListItem(
 );
 
 /// Chooses the sabydoc list marker for a markdown list.
-/// Param kind: The markdown list kind.
-/// Param anyTask: Whether any item of the list is a task item.
+/// Param kind: The markdown list kind (a list never mixes kinds).
 /// Returns The matching sabydoc list marker.
-sd::ListMarker listMarkerOf(
-    md::ListKind kind,
-    bool anyTask
-);
+sd::ListMarker listMarkerOf(md::ListKind kind);
 
 /// Maps a markdown list block.
 /// Param b: The markdown list block.
